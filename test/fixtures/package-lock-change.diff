@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index 1111111..2222222 100644
+--- a/package.json
++++ b/package.json
+@@ -3,6 +3,9 @@
+   "scripts": {
++    "postinstall": "node scripts/install.js",
+     "test": "vitest run"
+   },
+   "dependencies": {
++    "left-pad": "latest"
+   }
+ }
