@@ -1,0 +1,33 @@
+name: DiffWall
+description: A PR risk firewall for agent-written code.
+author: dburt-proex
+
+inputs:
+  base:
+    description: Base git ref
+    required: false
+    default: origin/main
+  head:
+    description: Head git ref
+    required: false
+    default: HEAD
+  config:
+    description: DiffWall policy file
+    required: false
+    default: rules/default.yml
+  fail-on-halt:
+    description: Exit non-zero when DiffWall routes HALT
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Run DiffWall
+      shell: bash
+      run: ${{ github.action_path }}/entrypoint.sh
+      env:
+        DIFFWALL_BASE: ${{ inputs.base }}
+        DIFFWALL_HEAD: ${{ inputs.head }}
+        DIFFWALL_CONFIG: ${{ inputs.config }}
+        DIFFWALL_FAIL_ON_HALT: ${{ inputs.fail-on-halt }}
