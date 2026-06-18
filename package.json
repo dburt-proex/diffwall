@@ -1,0 +1,27 @@
+{
+  "name": "diffwall",
+  "version": "0.1.0",
+  "description": "A PR risk firewall for agent-written code.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "diffwall": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "scan:demo": "tsx src/cli.ts scan --diff test/fixtures/auth-bypass.diff --format markdown",
+    "scan:staged": "tsx src/cli.ts scan --staged --format markdown"
+  },
+  "keywords": ["ai", "agents", "github-actions", "code-review", "devsecops", "pull-requests", "security"],
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
