@@ -1,0 +1,35 @@
+thresholds:
+  review: 40
+  halt: 75
+
+ignorePaths:
+  - "docs/**"
+  - "*.md"
+
+protectedPaths:
+  - ".github/workflows/**"
+  - "package.json"
+  - "package-lock.json"
+  - "pnpm-lock.yaml"
+  - "yarn.lock"
+  - "requirements.txt"
+  - "pyproject.toml"
+  - "go.mod"
+  - "go.sum"
+  - "src/auth/**"
+  - "src/security/**"
+  - "auth/**"
+  - "security/**"
+  - "billing/**"
+  - "db/migrations/**"
+  - "migrations/**"
+
+haltPatterns:
+  - "DROP TABLE"
+  - "TRUNCATE TABLE"
+  - "rm -rf"
+  - "chmod 777"
+  - "rejectUnauthorized: false"
+  - "verify: false"
+  - "verify=False"
+  - "NODE_TLS_REJECT_UNAUTHORIZED=0"
