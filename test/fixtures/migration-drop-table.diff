@@ -1,0 +1,8 @@
+diff --git a/db/migrations/202606180001_drop_users.sql b/db/migrations/202606180001_drop_users.sql
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/db/migrations/202606180001_drop_users.sql
+@@ -0,0 +1,2 @@
++DROP TABLE users;
++DROP TABLE sessions;
