@@ -25,7 +25,7 @@ runs:
   steps:
     - name: Run DiffWall
       shell: bash
-      run: ${{ github.action_path }}/entrypoint.sh
+      run: bash ${{ github.action_path }}/entrypoint.sh
       env:
         DIFFWALL_BASE: ${{ inputs.base }}
         DIFFWALL_HEAD: ${{ inputs.head }}
