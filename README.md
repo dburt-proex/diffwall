@@ -70,6 +70,24 @@ npm run build
 node dist/cli.js scan --diff test/fixtures/auth-bypass.diff --format markdown
 ```
 
+## Demo diffs
+
+DiffWall ships with three proof fixtures:
+
+```bash
+node dist/cli.js scan --diff demo/diffs/allow-docs.diff --format markdown
+node dist/cli.js scan --diff demo/diffs/review-auth-no-tests.diff --format markdown
+node dist/cli.js scan --diff demo/diffs/halt-destructive-migration.diff --format markdown --fail-on-halt
+```
+
+Expected routes:
+
+| Demo diff | Expected route | Why |
+|---|---|---|
+| `demo/diffs/allow-docs.diff` | ALLOW | Docs-only change ignored by default policy |
+| `demo/diffs/review-auth-no-tests.diff` | REVIEW | Auth-sensitive source changed without tests |
+| `demo/diffs/halt-destructive-migration.diff` | HALT | Destructive SQL migration forces block |
+
 ## Example output
 
 ```txt
@@ -125,6 +143,10 @@ protectedPaths:
   - "billing/**"
   - "migrations/**"
 ```
+
+## Launch copy
+
+Launch-ready post copy lives in `docs/launch-copy.md`.
 
 ## Why not just CodeQL, Semgrep, CI, or an AI PR reviewer?
 
