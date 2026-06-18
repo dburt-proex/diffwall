@@ -1,0 +1,6 @@
+node_modules/
+dist/
+coverage/
+*.log
+diffwall-report.md
+.DS_Store
