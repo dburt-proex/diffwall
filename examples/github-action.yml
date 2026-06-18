@@ -1,0 +1,25 @@
+name: DiffWall
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  diffwall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run DiffWall
+        uses: dburt-proex/diffwall/action@v0
+        with:
+          base: origin/${{ github.base_ref }}
+          head: HEAD
+          config: rules/default.yml
+          fail-on-halt: true
