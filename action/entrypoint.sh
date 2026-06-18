@@ -20,7 +20,7 @@ if [[ "$FAIL_ON_HALT" == "true" ]]; then
 fi
 
 cd "$ACTION_ROOT"
-npm install
+npm install --no-audit --no-fund
 npm run build
 
 cd "$CALLER_WORKSPACE"
