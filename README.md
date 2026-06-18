@@ -32,25 +32,7 @@ This is not an LLM reviewer. The first version is deterministic, transparent, an
 
 ## Quickstart
 
-Run against a diff file:
-
-```bash
-npx diffwall scan --diff test/fixtures/auth-bypass.diff --format markdown
-```
-
-Run against a PR diff:
-
-```bash
-npx diffwall scan --base origin/main --head HEAD --format markdown --fail-on-halt
-```
-
-Run against staged changes:
-
-```bash
-npx diffwall scan --staged
-```
-
-## GitHub Action
+Use DiffWall as a GitHub Action:
 
 ```yaml
 name: DiffWall
@@ -72,12 +54,20 @@ jobs:
           fetch-depth: 0
 
       - name: Run DiffWall
-        uses: dburt-proex/diffwall/action@v0
+        uses: dburt-proex/diffwall/action@v0.1.0
         with:
           base: origin/${{ github.base_ref }}
           head: HEAD
           config: rules/default.yml
           fail-on-halt: true
+```
+
+Run locally from a checkout:
+
+```bash
+npm install
+npm run build
+node dist/cli.js scan --diff test/fixtures/auth-bypass.diff --format markdown
 ```
 
 ## Example output
