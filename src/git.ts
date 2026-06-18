@@ -25,7 +25,7 @@ export function parseUnifiedDiff(diff: string): DiffFile[] {
   const files: DiffFile[] = [];
   let current: DiffFile | undefined;
 
-  for (const line of diff.split("\n")) {
+  for (const line of diff.split(/\r?\n/)) {
     if (line.startsWith("diff --git ")) {
       const match = line.match(/^diff --git a\/(.+?) b\/(.+)$/);
       const oldPath = match?.[1];
