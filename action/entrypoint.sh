@@ -26,6 +26,8 @@ npm run build
 cd "$CALLER_WORKSPACE"
 node "$ACTION_ROOT/dist/cli.js" "${ARGS[@]}" | tee "$REPORT_PATH"
 
-if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+if [[ -n "${DIFFWALL_COMMENT_TOKEN:-}" ]]; then
+  DIFFWALL_REPORT_PATH="$REPORT_PATH" GITHUB_TOKEN="$DIFFWALL_COMMENT_TOKEN" node "$ACTION_ROOT/dist/github-comment.js"
+elif [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
   cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
 fi
