@@ -144,6 +144,20 @@ protectedPaths:
   - "migrations/**"
 ```
 
+## Test coverage
+
+DiffWall's test suite is organized around three deterministic layers:
+
+- **Scanner/orchestration tests**: fixture-based `scanDiff` tests that prove end-to-end routing behavior.
+- **Rule-level tests**: direct unit tests for risk detectors such as protected paths, secrets, dependency lifecycle scripts, destructive operations, and network/exec patterns.
+- **Scoring threshold tests**: direct tests for ALLOW / REVIEW / HALT routing boundaries, critical halt precedence, score capping, and summary metadata.
+
+Run the full test suite with:
+
+```bash
+npm test
+```
+
 ## Launch copy
 
 Launch-ready post copy lives in `docs/launch-copy.md`.
