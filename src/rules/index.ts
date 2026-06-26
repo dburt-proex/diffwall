@@ -3,6 +3,7 @@ import { authAndSecretsRule } from "./auth-and-secrets.js";
 import { dependencyChangesRule } from "./dependency-changes.js";
 import { destructiveOpsRule } from "./destructive-ops.js";
 import { generatedCodeSizeRule } from "./generated-code-size.js";
+import { githubActionsRule } from "./github-actions.js";
 import { networkAndExecRule } from "./network-and-exec.js";
 import { sensitiveFilesRule } from "./sensitive-files.js";
 
@@ -12,5 +13,6 @@ export const defaultRules: Rule[] = [
   dependencyChangesRule,
   destructiveOpsRule,
   networkAndExecRule,
+  githubActionsRule,
   generatedCodeSizeRule
 ];
