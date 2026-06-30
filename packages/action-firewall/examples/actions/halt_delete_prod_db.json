@@ -1,0 +1,7 @@
+{
+  "id": "act-003",
+  "type": "delete_database",
+  "target": "prod",
+  "payload": "delete production database",
+  "params": {"environment": "production"}
+}

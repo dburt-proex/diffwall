@@ -1,0 +1,35 @@
+name: action-firewall-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  action-firewall:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/action-firewall
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run tests (stdlib unittest, no install)
+        run: python -m unittest discover -s tests -v
+
+      - name: Run the HALT demo
+        run: python demo/halt_demo.py
+
+      - name: Gate works — unsafe action must HALT (exit 2)
+        run: |
+          set +e
+          python -m diffwall.cli validate examples/actions/halt_delete_prod_db.json
+          code=$?
+          set -e
+          echo "exit code: $code"
+          test "$code" -eq 2
+
+      - name: Gate works — safe action must ALLOW (exit 0)
+        run: python -m diffwall.cli validate examples/actions/allow_read_file.json

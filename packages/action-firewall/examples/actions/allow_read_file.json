@@ -1,0 +1,7 @@
+{
+  "id": "act-001",
+  "type": "read_file",
+  "target": "./README.md",
+  "payload": "",
+  "params": {"mode": "r"}
+}
