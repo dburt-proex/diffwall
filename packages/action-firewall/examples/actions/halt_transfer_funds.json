@@ -1,0 +1,7 @@
+{
+  "id": "act-005",
+  "type": "transfer_funds",
+  "target": "external_account",
+  "payload": "wire transfer amount 500 usd",
+  "params": {"requires_human_approval": true}
+}
