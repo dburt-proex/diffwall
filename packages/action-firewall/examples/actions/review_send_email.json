@@ -1,0 +1,7 @@
+{
+  "id": "act-002",
+  "type": "send_email",
+  "target": "external-recipient@example.com",
+  "payload": "Launch announcement draft",
+  "params": {"audience": "external"}
+}
