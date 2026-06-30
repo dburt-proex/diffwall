@@ -50,13 +50,19 @@ Critical findings force `HALT`. Unknown agent actions fail safe to `REVIEW`, nev
 ## Repository layout
 
 ```txt
-packages/
-  pr-firewall/              # TypeScript GitHub PR diff firewall
-  action-firewall/          # Python CASA agent-action validator
-docs/
-  architecture.md           # CASA/VIL/DiffWall control-plane map
-  casa-mapping.md           # Policy-to-enforcement mapping
-  action-firewall-case-study.md
+src/                         # Current TypeScript PR Firewall implementation
+rules/                       # PR Firewall policy config
+demo/                        # PR Firewall diff fixtures / demos
+test/                        # PR Firewall tests
+packages/action-firewall/    # Python CASA agent-action validator
+docs/                        # CASA / VIL / DiffWall architecture docs
+```
+
+Future package migration target:
+
+```txt
+packages/pr-firewall/        # TypeScript GitHub PR diff firewall
+packages/action-firewall/    # Python CASA agent-action firewall
 ```
 
 ## PR Firewall
