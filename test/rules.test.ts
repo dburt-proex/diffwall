@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { defaultConfig } from "../src/config.js";
+import { fileURLToPath } from "node:url";
+import { defaultConfig, loadConfig } from "../src/config.js";
 import { authAndSecretsRule } from "../src/rules/auth-and-secrets.js";
 import { dependencyChangesRule } from "../src/rules/dependency-changes.js";
 import { destructiveOpsRule } from "../src/rules/destructive-ops.js";
@@ -115,5 +116,35 @@ describe("rule modules", () => {
         files: ["src/export.ts"]
       })
     ]);
+  });
+
+  it("matches Node/Express policy pack protected middleware, guards, and workflow/package files", () => {
+    const config = loadConfig(fileURLToPath(new URL("../policy-packs/node-express.yml", import.meta.url)));
+    const findings = sensitiveFilesRule([
+      diffFile("src/middleware/auth.ts"),
+      diffFile("src/middleware/session.ts"),
+      diffFile("src/middleware/jwt.ts"),
+      diffFile("src/routes/admin/guard.ts"),
+      diffFile("package.json"),
+      diffFile(".github/workflows/ci.yml")
+    ], config);
+
+    expect(findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "protected-path-change",
+        files: [
+          "src/middleware/auth.ts",
+          "src/middleware/session.ts",
+          "src/middleware/jwt.ts",
+          "src/routes/admin/guard.ts",
+          "package.json",
+          ".github/workflows/ci.yml"
+        ]
+      }),
+      expect.objectContaining({
+        ruleId: "github-workflow-change",
+        files: [".github/workflows/ci.yml"]
+      })
+    ]));
   });
 });

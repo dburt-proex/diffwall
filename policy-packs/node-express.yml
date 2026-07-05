@@ -1,0 +1,43 @@
+thresholds:
+  review: 40
+  halt: 75
+
+ignorePaths:
+  - "docs/**"
+  - "*.md"
+
+protectedPaths:
+  - ".github/workflows/**"
+  - "package.json"
+  - "package-lock.json"
+  - "pnpm-lock.yaml"
+  - "yarn.lock"
+  - "npm-shrinkwrap.json"
+  - "src/auth/**"
+  - "src/session/**"
+  - "src/middleware/auth*"
+  - "src/middleware/session*"
+  - "src/middleware/jwt*"
+  - "src/middleware/*guard*"
+  - "src/guards/**"
+  - "src/routes/**/guard*"
+  - "src/routes/**/*guard*"
+  - "**/auth/**"
+  - "**/session/**"
+  - "**/middleware/auth*"
+  - "**/middleware/session*"
+  - "**/middleware/jwt*"
+  - "**/middleware/*guard*"
+  - "**/guards/**"
+  - "**/routes/**/guard*"
+  - "**/routes/**/*guard*"
+
+haltPatterns:
+  - "DROP TABLE"
+  - "TRUNCATE TABLE"
+  - "rm -rf"
+  - "chmod 777"
+  - "rejectUnauthorized: false"
+  - "verify: false"
+  - "verify=False"
+  - "NODE_TLS_REJECT_UNAUTHORIZED=0"
