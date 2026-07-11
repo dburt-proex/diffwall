@@ -10,3 +10,4 @@ The validation is successful when:
 2. The generated report identifies this change as `ALLOW`.
 3. The workflow completes without the report-delivery path changing the enforcement verdict.
 4. The TypeScript and Python CI jobs complete successfully.
+5. The scan compares against the pull request's immutable base commit SHA.
