@@ -1,0 +1,31 @@
+name: Action Loader Debug
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/live-action-validation.md"
+
+permissions:
+  contents: read
+
+jobs:
+  loader:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 1
+          show-progress: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Invoke local DiffWall action
+        uses: ./action
+        with:
+          diff: test/fixtures/safe-doc-change.diff
+          format: markdown
+          fail_on_halt: false
