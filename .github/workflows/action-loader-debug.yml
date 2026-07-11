@@ -13,15 +13,10 @@ jobs:
   loader:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 1
-          show-progress: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Quiet clone of PR branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: git clone --quiet --depth 1 --branch "$HEAD_REF" "https://github.com/${GITHUB_REPOSITORY}.git" .
 
       - name: Invoke local DiffWall action
         uses: ./action
