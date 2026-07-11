@@ -39,8 +39,8 @@ jobs:
           head: HEAD
           config: rules/default.yml
           format: markdown
-          fail-on-halt: true
-          github-token: ${{ github.token }}
+          fail_on_halt: true
+          github_token: ${{ github.token }}
 
       - name: Capture DiffWall diagnostics
         if: always()
