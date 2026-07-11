@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   diffwall:
@@ -23,3 +24,4 @@ jobs:
           config: rules/default.yml
           format: markdown
           fail-on-halt: true
+          github-token: ${{ github.token }}
