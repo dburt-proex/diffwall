@@ -38,7 +38,7 @@ jobs:
         with:
           diff: test/fixtures/safe-doc-change.diff
           format: markdown
-          fail-on-halt: true
+          fail_on_halt: true
 
       - name: Verify ALLOW report
         run: |
@@ -50,7 +50,7 @@ jobs:
         with:
           diff: test/fixtures/review-dependency-change.diff
           format: markdown
-          fail-on-halt: true
+          fail_on_halt: true
 
       - name: Verify REVIEW report
         run: |
@@ -64,7 +64,7 @@ jobs:
         with:
           diff: test/fixtures/migration-drop-table.diff
           format: markdown
-          fail-on-halt: true
+          fail_on_halt: true
 
       - name: Verify HALT report survived failure
         if: always()
