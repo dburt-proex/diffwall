@@ -15,3 +15,4 @@ The validation is successful when:
 7. The base commit is explicitly available in shallow-checkout environments.
 8. The reusable action pins Node.js and persists its own runtime log.
 9. Composite-action metadata uses parser-safe input expressions.
+10. Node setup occurs in the caller workflow before the composite action executes.
