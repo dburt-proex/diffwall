@@ -1,6 +1,6 @@
 # DiffWall GitHub Action
 
-DiffWall includes an initial composite GitHub Action wrapper at:
+DiffWall includes a composite GitHub Action at:
 
 ```text
 action/action.yml
@@ -12,11 +12,11 @@ Use it from another repository with:
 uses: dburt-proex/diffwall/action@main
 ```
 
-For a pinned release later, replace `main` with a tag such as `v0.1.0` after the action has been validated in CI and tagged.
+The action has been validated in a real pull-request workflow. Pin a release tag instead of `main` before making it a required production merge gate.
 
 ---
 
-## Basic PR workflow
+## Recommended PR workflow
 
 ```yaml
 name: DiffWall
@@ -27,7 +27,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   diffwall:
@@ -37,60 +37,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run DiffWall
-        uses: dburt-proex/diffwall/action@main
+      - uses: actions/setup-node@v4
         with:
-          base: origin/${{ github.base_ref }}
-          head: HEAD
-          config: rules/default.yml
-          format: markdown
-          fail-on-halt: true
-```
-
-This runs DiffWall against the PR diff and fails the job when the route is `HALT`.
-
----
-
-## With PR comment update
-
-To let DiffWall create or update a marked PR comment, pass `github-token` and grant comment-write permission.
-
-```yaml
-name: DiffWall
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-permissions:
-  contents: read
-  pull-requests: read
-  issues: write
-
-jobs:
-  diffwall:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+          node-version: 20
 
       - name: Run DiffWall
         uses: dburt-proex/diffwall/action@main
         with:
-          base: origin/${{ github.base_ref }}
+          base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
           config: rules/default.yml
           format: markdown
-          fail-on-halt: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_halt: true
+          github_token: ${{ github.token }}
 ```
 
-Notes:
+This workflow:
 
-- Forked PRs may receive a read-only token depending on repository settings.
-- If no token is provided, DiffWall writes markdown to the job step summary when available.
-- The action now attempts to publish the report/comment before exiting with the HALT failure status.
+- scans against the pull request's immutable base commit,
+- generates a markdown report,
+- creates or updates one marked PR comment,
+- routes low-risk changes to `ALLOW`, impactful changes to `REVIEW`, and critical changes to `HALT`,
+- exits non-zero when `fail_on_halt` is enabled and the route is `HALT`.
+
+If no token is provided, DiffWall appends markdown to the job step summary when available. A PR-comment delivery failure does not replace or corrupt the enforcement verdict.
+
+Forked pull requests may receive a read-only token depending on repository settings. In that case, retain artifact or step-summary reporting and treat the comment as best-effort delivery.
 
 ---
 
@@ -98,14 +70,14 @@ Notes:
 
 | Input | Default | Purpose |
 |---|---|---|
-| `base` | `origin/main` | Base git ref for the diff. |
+| `base` | `origin/main` | Base git ref or immutable commit SHA for the diff. |
 | `head` | `HEAD` | Head git ref for the diff. |
 | `diff` | empty | Optional path to a unified diff file. Overrides base/head. |
-| `config` | `rules/default.yml` | Path to caller repo policy file. If missing, built-in defaults are used. |
+| `config` | `rules/default.yml` | Path to caller-repo policy file. If missing, built-in defaults are used. |
 | `format` | `markdown` | `text`, `json`, or `markdown`. |
-| `fail-on-halt` | `true` | Exit non-zero when route is `HALT`. |
+| `fail_on_halt` | `true` | Exit non-zero when route is `HALT`. |
 | `quiet` | `false` | Print only the final route decision. |
-| `github-token` | empty | Optional token for PR comment updates. |
+| `github_token` | empty | Optional token for PR comment updates. |
 
 ---
 
@@ -121,4 +93,6 @@ npx tsx src/cli.ts scan --base origin/main --head HEAD --format markdown --fail-
 
 ## Current maturity
 
-This action wrapper is **initial but functional in design**. Treat it as a hardening target until the repo has a passing self-test workflow that invokes the action through `uses:` and demonstrates all three routes: `ALLOW`, `REVIEW`, and `HALT`.
+The composite action is implemented and live-validated for loading, dependency installation, build, scanning, evidence generation, PR comment creation/update, and `REVIEW` enforcement. TypeScript and Python CI jobs also generate ALLOW / REVIEW / HALT evidence artifacts.
+
+Remaining release gate: prove the live PR `HALT` path blocks the workflow after the report and comment are published, then cut and document a pinned action tag.
