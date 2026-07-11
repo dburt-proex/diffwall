@@ -28,6 +28,7 @@ It should **not yet** be described as a fully hardened production DevSecOps prod
 | Python Action Firewall | Working | Validates structured action JSON and exits by verdict severity. |
 | Python unit tests | Present | Covers rule behavior and fail-safe routing. |
 | GitHub Action wrapper | Initial / hardened | Composite wrapper exists; report publishing now happens before HALT failure exit. Needs real PR validation. |
+| PR workflow | Added | `.github/workflows/diffwall.yml` invokes the local composite action on pull requests. Needs observed green/red run evidence. |
 | PR comment updater | Initial | `src/github-comment.ts` can create/update a marked PR comment when token and PR context exist. Needs workflow validation. |
 | Step summary report | Initial | Markdown report can be appended to `GITHUB_STEP_SUMMARY`. |
 | SARIF export | Not implemented | Roadmap item. |
@@ -65,6 +66,7 @@ That may become true after the GitHub Action path is validated in CI and a real 
 - [x] Harden composite GitHub Action wrapper inputs.
 - [x] Ensure report publishing runs before HALT failure exit.
 - [x] Publish the exact supported invocation path.
+- [x] Add repository PR workflow that invokes the local action wrapper.
 - [ ] Validate action wrapper in real PR workflow.
 - [ ] Confirm `fail-on-halt` blocks a PR job after report/comment publication.
 
@@ -72,7 +74,7 @@ That may become true after the GitHub Action path is validated in CI and a real 
 
 - [ ] Run TypeScript build, unit tests, and demo scan.
 - [ ] Run Python Action Firewall unit tests.
-- [ ] Add self-test workflow that invokes DiffWall as an action.
+- [ ] Add self-test workflow that invokes DiffWall as an action against ALLOW / REVIEW / HALT fixtures.
 - [ ] Upload JSON/Markdown scan artifacts.
 
 ### Phase 4 — Product proof
