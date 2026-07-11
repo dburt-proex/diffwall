@@ -20,3 +20,4 @@ The validation is successful when:
 12. The action path is explicitly mapped from the GitHub context into the shell environment.
 13. The composite shell writes a first-line startup marker before invoking the entrypoint.
 14. A minimal loader-smoke workflow exposes action metadata failures directly.
+15. The loader diagnostic uses a quiet clone to surface the exact final error.
