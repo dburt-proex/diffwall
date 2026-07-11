@@ -4,7 +4,7 @@ author: dburt-proex
 
 inputs:
   base:
-    description: Base git ref for the diff, such as origin/main or origin/${{ github.base_ref }}.
+    description: Base git ref for the diff, for example origin/main or an immutable commit SHA.
     required: false
     default: origin/main
   head:
@@ -28,11 +28,11 @@ inputs:
     required: false
     default: "true"
   quiet:
-    description: Only print the final ALLOW / REVIEW / HALT decision.
+    description: Only print the final ALLOW, REVIEW, or HALT decision.
     required: false
     default: "false"
   github-token:
-    description: Optional token used to create or update the DiffWall PR comment. Usually use secrets.GITHUB_TOKEN.
+    description: Optional token used to create or update the DiffWall PR comment.
     required: false
     default: ""
 
@@ -53,6 +53,6 @@ runs:
         DIFFWALL_DIFF: ${{ inputs.diff }}
         DIFFWALL_CONFIG: ${{ inputs.config }}
         DIFFWALL_FORMAT: ${{ inputs.format }}
-        DIFFWALL_FAIL_ON_HALT: ${{ inputs.fail-on-halt }}
+        DIFFWALL_FAIL_ON_HALT: ${{ inputs['fail-on-halt'] }}
         DIFFWALL_QUIET: ${{ inputs.quiet }}
-        DIFFWALL_COMMENT_TOKEN: ${{ inputs.github-token }}
+        DIFFWALL_COMMENT_TOKEN: ${{ inputs['github-token'] }}
