@@ -18,6 +18,8 @@ jobs:
           show-progress: false
 
       - name: Run DiffWall
+        id: diffwall
+        continue-on-error: true
         uses: ./action
         with:
           base: ${{ github.event.pull_request.base.sha }}
@@ -26,3 +28,31 @@ jobs:
           format: markdown
           fail-on-halt: true
           github-token: ${{ github.token }}
+
+      - name: Upload DiffWall report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diffwall-pr-report
+          path: diffwall-report.md
+          if-no-files-found: warn
+
+      - name: Enforce DiffWall result
+        if: always()
+        env:
+          DIFFWALL_ACTION_OUTCOME: ${{ steps.diffwall.outcome }}
+        run: |
+          if [[ ! -f diffwall-report.md ]]; then
+            echo "::error::DiffWall action failed before producing its report."
+            exit 1
+          fi
+
+          if grep -q "DiffWall result: HALT" diffwall-report.md; then
+            echo "::error::DiffWall routed this pull request to HALT."
+            exit 2
+          fi
+
+          if [[ "$DIFFWALL_ACTION_OUTCOME" != "success" ]]; then
+            echo "::error::DiffWall wrapper failed after producing a non-HALT report."
+            exit 1
+          fi
