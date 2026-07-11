@@ -1,0 +1,82 @@
+name: Action Self-Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "action/**"
+      - "src/**"
+      - "rules/**"
+      - "test/fixtures/**"
+      - ".github/workflows/action-self-test.yml"
+      - "package.json"
+      - "tsconfig.json"
+
+permissions:
+  contents: read
+
+jobs:
+  routes:
+    name: Prove ALLOW, REVIEW, and HALT
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Prepare evidence directory
+        run: mkdir -p artifacts/action-self-test
+
+      - name: Prove ALLOW route
+        uses: ./action
+        with:
+          diff: test/fixtures/safe-doc-change.diff
+          format: markdown
+          fail-on-halt: true
+
+      - name: Verify ALLOW report
+        run: |
+          grep -q "DiffWall result: ALLOW" diffwall-report.md
+          cp diffwall-report.md artifacts/action-self-test/allow.md
+
+      - name: Prove REVIEW route
+        uses: ./action
+        with:
+          diff: test/fixtures/review-dependency-change.diff
+          format: markdown
+          fail-on-halt: true
+
+      - name: Verify REVIEW report
+        run: |
+          grep -q "DiffWall result: REVIEW" diffwall-report.md
+          cp diffwall-report.md artifacts/action-self-test/review.md
+
+      - name: Prove HALT route and expected job failure
+        id: halt
+        continue-on-error: true
+        uses: ./action
+        with:
+          diff: test/fixtures/migration-drop-table.diff
+          format: markdown
+          fail-on-halt: true
+
+      - name: Verify HALT report survived failure
+        if: always()
+        run: |
+          test "${{ steps.halt.outcome }}" = "failure"
+          grep -q "DiffWall result: HALT" diffwall-report.md
+          cp diffwall-report.md artifacts/action-self-test/halt.md
+
+      - name: Upload route evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diffwall-action-route-evidence
+          path: artifacts/action-self-test
+          if-no-files-found: error
