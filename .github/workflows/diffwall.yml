@@ -55,6 +55,8 @@ jobs:
             fi
             echo "report_files:"
             find "$GITHUB_WORKSPACE" -maxdepth 4 -type f -name 'diffwall-report.*' -print
+            echo "action_logs:"
+            find "$GITHUB_WORKSPACE" -maxdepth 4 -type f -name 'diffwall-action.log' -print
             if [[ -f diffwall-report.md ]]; then
               echo "report_content:"
               cat diffwall-report.md
@@ -68,6 +70,7 @@ jobs:
           name: diffwall-pr-evidence
           path: |
             diffwall-report.md
+            diffwall-action.log
             diffwall-diagnostics.txt
           if-no-files-found: error
 
