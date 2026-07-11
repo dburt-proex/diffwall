@@ -10,6 +10,15 @@ FAIL_ON_HALT="${DIFFWALL_FAIL_ON_HALT:-true}"
 QUIET="${DIFFWALL_QUIET:-false}"
 CALLER_WORKSPACE="${GITHUB_WORKSPACE:-$PWD}"
 ACTION_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ACTION_LOG_PATH="$CALLER_WORKSPACE/diffwall-action.log"
+
+: > "$ACTION_LOG_PATH"
+exec > >(tee -a "$ACTION_LOG_PATH") 2>&1
+
+echo "DiffWall action root: $ACTION_ROOT"
+echo "DiffWall caller workspace: $CALLER_WORKSPACE"
+echo "Node: $(node --version)"
+echo "npm: $(npm --version)"
 
 case "$FORMAT" in
   json) REPORT_PATH="$CALLER_WORKSPACE/diffwall-report.json" ;;
@@ -46,10 +55,14 @@ if [[ "$QUIET" == "true" ]]; then
   ARGS+=(--quiet)
 fi
 
+echo "Installing DiffWall dependencies..."
 cd "$ACTION_ROOT"
 npm install --no-audit --no-fund
+
+echo "Building DiffWall..."
 npm run build
 
+echo "Running DiffWall scan..."
 cd "$CALLER_WORKSPACE"
 set +e
 node "$ACTION_ROOT/dist/cli.js" "${ARGS[@]}" | tee "$REPORT_PATH"
@@ -72,4 +85,5 @@ elif [[ -n "${GITHUB_STEP_SUMMARY:-}" && "$FORMAT" == "markdown" && "$QUIET" != 
   cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
 fi
 
+echo "DiffWall scan exit status: $SCAN_STATUS"
 exit "$SCAN_STATUS"
