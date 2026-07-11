@@ -17,6 +17,10 @@ jobs:
           fetch-depth: 2
           show-progress: false
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Ensure immutable base commit is available
         env:
           DIFFWALL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
