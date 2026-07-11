@@ -14,12 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
+          show-progress: false
 
       - name: Run DiffWall
         uses: ./action
         with:
-          base: origin/${{ github.base_ref }}
+          base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
           config: rules/default.yml
           format: markdown
