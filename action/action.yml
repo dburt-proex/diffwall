@@ -39,6 +39,11 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
     - name: Run DiffWall
       shell: bash
       run: bash ${{ github.action_path }}/entrypoint.sh
