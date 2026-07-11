@@ -16,10 +16,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run DiffWall
-        uses: dburt-proex/diffwall/action@v0
+      - uses: actions/setup-node@v4
         with:
-          base: origin/${{ github.base_ref }}
+          node-version: 20
+
+      - name: Run DiffWall
+        uses: dburt-proex/diffwall/action@main
+        with:
+          base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
           config: rules/default.yml
-          fail-on-halt: true
+          format: markdown
+          fail_on_halt: true
+          github_token: ${{ github.token }}
