@@ -14,3 +14,4 @@ The validation is successful when:
 6. The workflow uploads its report before enforcing the verdict.
 7. The base commit is explicitly available in shallow-checkout environments.
 8. The reusable action pins Node.js and persists its own runtime log.
+9. Composite-action metadata uses parser-safe input expressions.
