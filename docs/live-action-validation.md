@@ -18,3 +18,4 @@ The validation is successful when:
 10. Node setup occurs in the caller workflow before the composite action executes.
 11. The action uses underscore input names and a shell-safe action path.
 12. The action path is explicitly mapped from the GitHub context into the shell environment.
+13. The composite shell writes a first-line startup marker before invoking the entrypoint.
