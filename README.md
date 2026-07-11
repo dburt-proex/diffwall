@@ -17,6 +17,8 @@ It protects two execution surfaces:
 
 DiffWall is not an LLM reviewer. The core design goal is deterministic, transparent, repo-local enforcement.
 
+> **Current status:** early working enforcement system. Local CLI, TypeScript PR scanner, Python Action Firewall, and rule tests exist. GitHub Action support is now in initial wrapper form and should be validated in real PR workflows before calling it production-ready. See [`STATUS.md`](STATUS.md).
+
 ```txt
 External signal / PR diff / agent intent
         ↓
@@ -54,6 +56,7 @@ src/                         # Current TypeScript PR Firewall implementation
 rules/                       # PR Firewall policy config
 demo/                        # PR Firewall diff fixtures / demos
 test/                        # PR Firewall tests
+action/                      # Composite GitHub Action wrapper
 packages/action-firewall/    # Python CASA agent-action validator
 docs/                        # CASA / VIL / DiffWall architecture docs
 ```
@@ -80,12 +83,14 @@ Policy engine
    ↓
 ALLOW / REVIEW / HALT
    ↓
-PR check + comment + audit JSON
+Markdown / JSON output + CI route
 ```
 
 Built for teams using Codex, Claude Code, Cursor, Copilot, OpenCode, and other coding agents.
 
 ### GitHub Action quickstart
+
+> Initial wrapper available. Validate it in your repo before using it as a required merge gate.
 
 ```yaml
 name: DiffWall
@@ -96,7 +101,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   diffwall:
@@ -107,11 +112,12 @@ jobs:
           fetch-depth: 0
 
       - name: Run DiffWall
-        uses: dburt-proex/diffwall/action@v0.1.0
+        uses: dburt-proex/diffwall/action@main
         with:
           base: origin/${{ github.base_ref }}
           head: HEAD
           config: rules/default.yml
+          format: markdown
           fail-on-halt: true
 ```
 
@@ -122,6 +128,19 @@ npm install
 npm run build
 npm test
 npm run scan:demo
+```
+
+### Local CLI usage
+
+```bash
+# Scan a fixture or saved unified diff
+npx tsx src/cli.ts scan --diff test/fixtures/auth-bypass.diff --format markdown
+
+# Scan staged local changes
+npx tsx src/cli.ts scan --staged --format markdown
+
+# Scan two refs
+npx tsx src/cli.ts scan --base origin/main --head HEAD --format json --fail-on-halt
 ```
 
 ### Default PR risk signals
@@ -182,9 +201,8 @@ The Action Firewall currently includes rules for irreversible destruction, finan
 
 ## Roadmap
 
-- Promote PR Firewall to the current production adapter
-- Keep Action Firewall as the CASA enforcement proof
-- Add shared policy schema for both adapters
+- Validate composite GitHub Action wrapper in PR workflow
+- Add self-test workflow that invokes DiffWall through `uses:`
 - Add GitHub PR comment updater
 - Add SARIF export
 - Add CODEOWNERS-aware routing
