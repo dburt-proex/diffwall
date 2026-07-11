@@ -17,7 +17,7 @@ It protects two execution surfaces:
 
 DiffWall is not an LLM reviewer. The core design goal is deterministic, transparent, repo-local enforcement.
 
-> **Current status:** early working enforcement system. Local CLI, TypeScript PR scanner, Python Action Firewall, and rule tests exist. GitHub Action support is now in initial wrapper form and should be validated in real PR workflows before calling it production-ready. See [`STATUS.md`](STATUS.md).
+> **Current status:** early working enforcement system. The TypeScript PR scanner, Python Action Firewall, composite GitHub Action, PR comment updater, and CI evidence paths are implemented and have been exercised in a real pull request. It is not yet positioned as a fully hardened enterprise DevSecOps product. See [`STATUS.md`](STATUS.md).
 
 ```txt
 External signal / PR diff / agent intent
@@ -90,8 +90,6 @@ Built for teams using Codex, Claude Code, Cursor, Copilot, OpenCode, and other c
 
 ### GitHub Action quickstart
 
-> Initial wrapper available. Validate it in your repo before using it as a required merge gate.
-
 ```yaml
 name: DiffWall
 
@@ -101,7 +99,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   diffwall:
@@ -111,15 +109,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Run DiffWall
         uses: dburt-proex/diffwall/action@main
         with:
-          base: origin/${{ github.base_ref }}
+          base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
           config: rules/default.yml
           format: markdown
-          fail-on-halt: true
+          fail_on_halt: true
+          github_token: ${{ github.token }}
 ```
+
+This invocation has been validated in a real pull-request workflow. Pin a release tag rather than `main` before making DiffWall a required production merge gate.
 
 ### Local development
 
@@ -201,14 +206,13 @@ The Action Firewall currently includes rules for irreversible destruction, finan
 
 ## Roadmap
 
-- Validate composite GitHub Action wrapper in PR workflow
-- Add self-test workflow that invokes DiffWall through `uses:`
-- Add GitHub PR comment updater
+- Publish a pinned action release after HALT-path validation
 - Add SARIF export
 - Add CODEOWNERS-aware routing
 - Add policy packs for Node, Python, Rails, Django, Terraform, and GitHub Actions
 - Add runtime agent middleware for action validation
 - Add audit log export
+- Add buyer-facing screenshots and ALLOW / REVIEW / HALT demo media
 
 ## License
 
