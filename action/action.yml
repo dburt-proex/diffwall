@@ -23,7 +23,7 @@ inputs:
     description: Output format: text, json, or markdown.
     required: false
     default: markdown
-  fail-on-halt:
+  fail_on_halt:
     description: Exit non-zero when DiffWall routes the change to HALT.
     required: false
     default: "true"
@@ -31,7 +31,7 @@ inputs:
     description: Only print the final ALLOW, REVIEW, or HALT decision.
     required: false
     default: "false"
-  github-token:
+  github_token:
     description: Optional token used to create or update the DiffWall PR comment.
     required: false
     default: ""
@@ -41,13 +41,15 @@ runs:
   steps:
     - name: Run DiffWall
       shell: bash
-      run: bash ${{ github.action_path }}/entrypoint.sh
+      run: |
+        echo "Starting DiffWall composite action"
+        bash "$GITHUB_ACTION_PATH/entrypoint.sh"
       env:
         DIFFWALL_BASE: ${{ inputs.base }}
         DIFFWALL_HEAD: ${{ inputs.head }}
         DIFFWALL_DIFF: ${{ inputs.diff }}
         DIFFWALL_CONFIG: ${{ inputs.config }}
         DIFFWALL_FORMAT: ${{ inputs.format }}
-        DIFFWALL_FAIL_ON_HALT: ${{ inputs['fail-on-halt'] }}
+        DIFFWALL_FAIL_ON_HALT: ${{ inputs.fail_on_halt }}
         DIFFWALL_QUIET: ${{ inputs.quiet }}
-        DIFFWALL_COMMENT_TOKEN: ${{ inputs['github-token'] }}
+        DIFFWALL_COMMENT_TOKEN: ${{ inputs.github_token }}
