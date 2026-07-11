@@ -42,7 +42,18 @@ runs:
     - name: Run DiffWall
       shell: bash
       run: |
-        echo "Starting DiffWall composite action"
+        {
+          echo "composite_started=true"
+          echo "workspace=$GITHUB_WORKSPACE"
+          echo "action_path=$DIFFWALL_ACTION_PATH"
+          echo "pwd=$(pwd)"
+        } > "$GITHUB_WORKSPACE/diffwall-composite.log"
+
+        if [[ -z "$DIFFWALL_ACTION_PATH" ]]; then
+          echo "action_path_missing=true" >> "$GITHUB_WORKSPACE/diffwall-composite.log"
+          exit 90
+        fi
+
         bash "$DIFFWALL_ACTION_PATH/entrypoint.sh"
       env:
         DIFFWALL_ACTION_PATH: ${{ github.action_path }}
