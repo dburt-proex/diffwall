@@ -1,26 +1,38 @@
 name: DiffWall
-description: A PR risk firewall for agent-written code.
+description: Deterministic PR risk firewall for AI-generated code and agent changes.
 author: dburt-proex
 
 inputs:
   base:
-    description: Base git ref
+    description: Base git ref for the diff, such as origin/main or origin/${{ github.base_ref }}.
     required: false
     default: origin/main
   head:
-    description: Head git ref
+    description: Head git ref for the diff, usually HEAD.
     required: false
     default: HEAD
+  diff:
+    description: Optional path to a unified diff file. When provided, the CLI scans this file instead of base/head refs.
+    required: false
+    default: ""
   config:
-    description: DiffWall policy file
+    description: DiffWall policy file. If the file does not exist in the caller workspace, DiffWall uses its built-in defaults.
     required: false
     default: rules/default.yml
+  format:
+    description: Output format: text, json, or markdown.
+    required: false
+    default: markdown
   fail-on-halt:
-    description: Exit non-zero when DiffWall routes HALT
+    description: Exit non-zero when DiffWall routes the change to HALT.
     required: false
     default: "true"
+  quiet:
+    description: Only print the final ALLOW / REVIEW / HALT decision.
+    required: false
+    default: "false"
   github-token:
-    description: Optional token used to create or update the DiffWall PR comment
+    description: Optional token used to create or update the DiffWall PR comment. Usually use secrets.GITHUB_TOKEN.
     required: false
     default: ""
 
@@ -33,6 +45,9 @@ runs:
       env:
         DIFFWALL_BASE: ${{ inputs.base }}
         DIFFWALL_HEAD: ${{ inputs.head }}
+        DIFFWALL_DIFF: ${{ inputs.diff }}
         DIFFWALL_CONFIG: ${{ inputs.config }}
+        DIFFWALL_FORMAT: ${{ inputs.format }}
         DIFFWALL_FAIL_ON_HALT: ${{ inputs.fail-on-halt }}
+        DIFFWALL_QUIET: ${{ inputs.quiet }}
         DIFFWALL_COMMENT_TOKEN: ${{ inputs.github-token }}
