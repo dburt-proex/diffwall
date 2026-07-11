@@ -13,6 +13,12 @@ DiffWall is currently best described as an **early working deterministic enforce
 
 It should not yet be described as a fully hardened enterprise DevSecOps product. The next release gates are a pinned action tag, broader compatibility testing, and product-facing proof media.
 
+Public proof:
+
+- [`docs/live-validation-case-study.md`](docs/live-validation-case-study.md) — controlled real-PR `REVIEW` and `HALT` evidence.
+- [`docs/use-cases.md`](docs/use-cases.md) — buyer problems, technical use cases, and initial commercial packages.
+- [`docs/github-action.md`](docs/github-action.md) — validated integration contract and inputs.
+
 ---
 
 ## Capability matrix
@@ -78,8 +84,8 @@ Avoid claiming full enterprise production readiness until a pinned release, broa
 
 - [ ] Add screenshots/GIF for ALLOW, REVIEW, and HALT flows.
 - [x] Add deterministic fixtures for all three routes.
-- [ ] Add buyer-facing use cases.
-- [ ] Add one polished public validation case study.
+- [x] Add buyer-facing use cases.
+- [x] Add one polished public validation case study.
 
 ### Phase 5 — Productization
 
