@@ -19,3 +19,4 @@ The validation is successful when:
 11. The action uses underscore input names and a shell-safe action path.
 12. The action path is explicitly mapped from the GitHub context into the shell environment.
 13. The composite shell writes a first-line startup marker before invoking the entrypoint.
+14. A minimal loader-smoke workflow exposes action metadata failures directly.
