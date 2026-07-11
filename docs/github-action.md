@@ -12,7 +12,7 @@ Use it from another repository with:
 uses: dburt-proex/diffwall/action@main
 ```
 
-The action has been validated in a real pull-request workflow. Pin a release tag instead of `main` before making it a required production merge gate.
+The action has been validated in real `REVIEW` and `HALT` pull-request workflows. Pin a release tag instead of `main` before making it a required production merge gate.
 
 ---
 
@@ -93,6 +93,6 @@ npx tsx src/cli.ts scan --base origin/main --head HEAD --format markdown --fail-
 
 ## Current maturity
 
-The composite action is implemented and live-validated for loading, dependency installation, build, scanning, evidence generation, PR comment creation/update, and `REVIEW` enforcement. TypeScript and Python CI jobs also generate ALLOW / REVIEW / HALT evidence artifacts.
+The composite action is live-validated for loading, dependency installation, build, scanning, evidence generation, PR comment creation/update, `REVIEW` routing, and `HALT` enforcement. In the controlled HALT proof, the report and comment were published before the workflow failed as designed. TypeScript and Python CI jobs also generate ALLOW / REVIEW / HALT evidence artifacts.
 
-Remaining release gate: prove the live PR `HALT` path blocks the workflow after the report and comment are published, then cut and document a pinned action tag.
+Next release gate: cut and document a pinned action tag, then expand compatibility testing across representative Node, Python, infrastructure, and monorepo repositories.
