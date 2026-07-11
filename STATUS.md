@@ -6,12 +6,12 @@ Last updated: 2026-07-11
 
 DiffWall is **not just theory**. The repository contains working enforcement code for two surfaces:
 
-1. **PR Firewall** — TypeScript CLI that scans unified diffs, applies deterministic rules, scores risk, and routes changes to `ALLOW`, `REVIEW`, or `HALT`.
+1. **PR Firewall** — TypeScript CLI and GitHub Action that scan unified diffs, apply deterministic rules, score risk, and route changes to `ALLOW`, `REVIEW`, or `HALT`.
 2. **Action Firewall** — Python stdlib-only validator that evaluates structured AI/agent action objects before execution.
 
-DiffWall is currently best described as an **early deterministic enforcement firewall** with a working local CLI, rule tests, Python action validator, PR-comment updater, and an initial GitHub Action wrapper.
+DiffWall is currently best described as an **early working deterministic enforcement firewall** with live-validated PR workflow integration, PR comment delivery, evidence artifacts, and CI coverage for both engines.
 
-It should **not yet** be described as a fully hardened production DevSecOps product.
+It should not yet be described as a fully hardened enterprise DevSecOps product. A pinned release and live `HALT`-path proof remain release gates.
 
 ---
 
@@ -21,16 +21,16 @@ It should **not yet** be described as a fully hardened production DevSecOps prod
 |---|---:|---|
 | TypeScript PR diff scanner | Working | Parses unified diffs and applies default rules. |
 | Deterministic ALLOW / REVIEW / HALT routing | Working | Score thresholds plus hard HALT findings. |
-| Local CLI scan | Working | `diffwall scan` supports diff files, staged changes, and base/head refs. |
-| Markdown output | Working | Suitable for PR comments or audit notes. |
-| JSON output | Working | Suitable for artifacts and automation. |
-| Unit tests for TypeScript rules/scoring | Present | Vitest coverage exists for key rules and thresholds. |
+| Local CLI scan | Working | Supports diff files, staged changes, and base/head refs. |
+| Markdown and JSON output | Working | Used by CI evidence and PR reporting. |
+| TypeScript unit/build CI | Proven | Build, tests, demo scan, and three-route evidence completed successfully. |
 | Python Action Firewall | Working | Validates structured action JSON and exits by verdict severity. |
-| Python unit tests | Present | Covers rule behavior and fail-safe routing. |
-| GitHub Action wrapper | Initial / hardened | Composite wrapper exists; report publishing now happens before HALT failure exit. Needs real PR validation. |
-| PR workflow | Added | `.github/workflows/diffwall.yml` invokes the local composite action on pull requests. Needs observed green/red run evidence. |
-| PR comment updater | Initial | `src/github-comment.ts` can create/update a marked PR comment when token and PR context exist. Needs workflow validation. |
-| Step summary report | Initial | Markdown report can be appended to `GITHUB_STEP_SUMMARY`. |
+| Python unit/CLI CI | Proven | Tests, demo, exit-code checks, and three-route evidence completed successfully. |
+| Composite GitHub Action | Live validated | Loaded and executed through `uses: ./action` in a real PR workflow. |
+| PR workflow | Live validated | Immutable base SHA, evidence upload, and route enforcement completed successfully. |
+| PR comment updater | Live validated | Created a marked DiffWall comment with a `REVIEW` report on the validation PR. |
+| Evidence artifacts | Working | PR reports, diagnostics, and engine route evidence upload through GitHub Actions. |
+| Live HALT PR enforcement | Pending | Next release gate. |
 | SARIF export | Not implemented | Roadmap item. |
 | CODEOWNERS-aware routing | Not implemented | Roadmap item. |
 | Policy packs | Not implemented | Roadmap item. |
@@ -41,19 +41,13 @@ It should **not yet** be described as a fully hardened production DevSecOps prod
 
 ## What is safe to claim now
 
-Use this language:
+> DiffWall is an early working PR and agent-action firewall. It scans diffs and structured actions, applies explainable deterministic risk rules, routes changes to ALLOW, REVIEW, or HALT, and includes a live-validated GitHub Action with PR comments and evidence artifacts.
 
-> DiffWall is an early deterministic PR and agent-action firewall. It locally scans diffs and structured actions, applies explainable risk rules, routes each change to ALLOW, REVIEW, or HALT, and includes an initial GitHub Action wrapper for PR workflows.
-
-Avoid this language for now:
-
-> Production-ready GitHub Action for enterprise AI PR governance.
-
-That may become true after the GitHub Action path is validated in CI and a real PR demo exists.
+Avoid claiming full enterprise production readiness until the live HALT path, pinned release, broader compatibility testing, and operational hardening are complete.
 
 ---
 
-## Hardening priorities
+## Hardening progress
 
 ### Phase 1 — Truth alignment
 
@@ -64,32 +58,37 @@ That may become true after the GitHub Action path is validated in CI and a real 
 ### Phase 2 — GitHub Action hardening
 
 - [x] Harden composite GitHub Action wrapper inputs.
-- [x] Ensure report publishing runs before HALT failure exit.
+- [x] Fix strict action-manifest YAML parsing.
+- [x] Ensure report publishing runs before verdict enforcement.
 - [x] Publish the exact supported invocation path.
-- [x] Add repository PR workflow that invokes the local action wrapper.
-- [ ] Validate action wrapper in real PR workflow.
-- [ ] Confirm `fail-on-halt` blocks a PR job after report/comment publication.
+- [x] Add repository PR workflow invoking the local action wrapper.
+- [x] Validate the action wrapper in a real PR workflow.
+- [x] Validate PR comment create/update behavior.
+- [ ] Confirm live `HALT` blocks a PR job after report/comment publication.
 
 ### Phase 3 — CI proof
 
-- [ ] Run TypeScript build, unit tests, and demo scan.
-- [ ] Run Python Action Firewall unit tests.
-- [ ] Add self-test workflow that invokes DiffWall as an action against ALLOW / REVIEW / HALT fixtures.
-- [ ] Upload JSON/Markdown scan artifacts.
+- [x] Run TypeScript build, unit tests, and demo scan.
+- [x] Run Python Action Firewall unit tests and CLI exit-code checks.
+- [x] Add action self-test workflow for ALLOW / REVIEW / HALT fixtures.
+- [x] Generate and upload route evidence artifacts.
+- [x] Persist PR report and diagnostics artifacts.
 
 ### Phase 4 — Product proof
 
 - [ ] Add screenshots/GIF for ALLOW, REVIEW, and HALT flows.
-- [ ] Add sample PRs or fixtures for each route.
+- [x] Add deterministic fixtures for all three routes.
 - [ ] Add buyer-facing use cases.
+- [ ] Add one polished public validation case study.
 
 ### Phase 5 — Productization
 
-- [ ] SARIF export.
-- [ ] CODEOWNERS-aware routing.
-- [ ] Policy packs.
-- [ ] Runtime middleware.
-- [ ] Audit log export.
+- [ ] Cut a pinned action release after live HALT validation.
+- [ ] Add SARIF export.
+- [ ] Add CODEOWNERS-aware routing.
+- [ ] Add policy packs.
+- [ ] Add runtime middleware.
+- [ ] Add audit log export.
 
 ---
 
