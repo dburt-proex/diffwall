@@ -9,7 +9,7 @@ DiffWall is **not just theory**. The repository contains working enforcement cod
 1. **PR Firewall** — TypeScript CLI that scans unified diffs, applies deterministic rules, scores risk, and routes changes to `ALLOW`, `REVIEW`, or `HALT`.
 2. **Action Firewall** — Python stdlib-only validator that evaluates structured AI/agent action objects before execution.
 
-DiffWall is currently best described as an **early deterministic enforcement firewall** with a working local CLI, rule tests, and an initial GitHub Action wrapper.
+DiffWall is currently best described as an **early deterministic enforcement firewall** with a working local CLI, rule tests, Python action validator, PR-comment updater, and an initial GitHub Action wrapper.
 
 It should **not yet** be described as a fully hardened production DevSecOps product.
 
@@ -27,8 +27,9 @@ It should **not yet** be described as a fully hardened production DevSecOps prod
 | Unit tests for TypeScript rules/scoring | Present | Vitest coverage exists for key rules and thresholds. |
 | Python Action Firewall | Working | Validates structured action JSON and exits by verdict severity. |
 | Python unit tests | Present | Covers rule behavior and fail-safe routing. |
-| GitHub Action wrapper | Initial | Composite wrapper added; needs CI validation in real PR workflow. |
-| PR comment updater | Not implemented | Markdown output exists, but automatic GitHub comment posting is future work. |
+| GitHub Action wrapper | Initial / hardened | Composite wrapper exists; report publishing now happens before HALT failure exit. Needs real PR validation. |
+| PR comment updater | Initial | `src/github-comment.ts` can create/update a marked PR comment when token and PR context exist. Needs workflow validation. |
+| Step summary report | Initial | Markdown report can be appended to `GITHUB_STEP_SUMMARY`. |
 | SARIF export | Not implemented | Roadmap item. |
 | CODEOWNERS-aware routing | Not implemented | Roadmap item. |
 | Policy packs | Not implemented | Roadmap item. |
@@ -41,7 +42,7 @@ It should **not yet** be described as a fully hardened production DevSecOps prod
 
 Use this language:
 
-> DiffWall is an early deterministic PR and agent-action firewall. It locally scans diffs and structured actions, applies explainable risk rules, and routes each change to ALLOW, REVIEW, or HALT.
+> DiffWall is an early deterministic PR and agent-action firewall. It locally scans diffs and structured actions, applies explainable risk rules, routes each change to ALLOW, REVIEW, or HALT, and includes an initial GitHub Action wrapper for PR workflows.
 
 Avoid this language for now:
 
@@ -55,38 +56,38 @@ That may become true after the GitHub Action path is validated in CI and a real 
 
 ### Phase 1 — Truth alignment
 
-- Keep this `STATUS.md` current.
-- Keep README claims aligned with implemented capability.
-- Document what is working, experimental, and planned.
+- [x] Add repo-level `STATUS.md`.
+- [x] Align README claims with implemented capability.
+- [x] Document what is working, experimental, and planned.
 
 ### Phase 2 — GitHub Action hardening
 
-- Add and validate composite GitHub Action wrapper.
-- Add example workflow using the real action path.
-- Confirm `fail-on-halt` blocks a PR job.
-- Publish the exact supported invocation path.
+- [x] Harden composite GitHub Action wrapper inputs.
+- [x] Ensure report publishing runs before HALT failure exit.
+- [x] Publish the exact supported invocation path.
+- [ ] Validate action wrapper in real PR workflow.
+- [ ] Confirm `fail-on-halt` blocks a PR job after report/comment publication.
 
 ### Phase 3 — CI proof
 
-- Run TypeScript build, unit tests, and demo scan.
-- Run Python Action Firewall unit tests.
-- Add self-test workflow that invokes DiffWall as an action.
-- Upload JSON/Markdown scan artifacts.
+- [ ] Run TypeScript build, unit tests, and demo scan.
+- [ ] Run Python Action Firewall unit tests.
+- [ ] Add self-test workflow that invokes DiffWall as an action.
+- [ ] Upload JSON/Markdown scan artifacts.
 
 ### Phase 4 — Product proof
 
-- Add screenshots/GIF for ALLOW, REVIEW, and HALT flows.
-- Add sample PRs or fixtures for each route.
-- Add buyer-facing use cases.
+- [ ] Add screenshots/GIF for ALLOW, REVIEW, and HALT flows.
+- [ ] Add sample PRs or fixtures for each route.
+- [ ] Add buyer-facing use cases.
 
 ### Phase 5 — Productization
 
-- PR comment updater.
-- SARIF export.
-- Policy packs.
-- CODEOWNERS-aware routing.
-- Runtime action middleware.
-- Audit log export.
+- [ ] SARIF export.
+- [ ] CODEOWNERS-aware routing.
+- [ ] Policy packs.
+- [ ] Runtime middleware.
+- [ ] Audit log export.
 
 ---
 
