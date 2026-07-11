@@ -1,38 +1,38 @@
 name: DiffWall
-description: Deterministic PR risk firewall for AI-generated code and agent changes.
+description: "Deterministic PR risk firewall for AI-generated code and agent changes."
 author: dburt-proex
 
 inputs:
   base:
-    description: Base git ref for the diff, for example origin/main or an immutable commit SHA.
+    description: "Base git ref for the diff, for example origin/main or an immutable commit SHA."
     required: false
     default: origin/main
   head:
-    description: Head git ref for the diff, usually HEAD.
+    description: "Head git ref for the diff, usually HEAD."
     required: false
     default: HEAD
   diff:
-    description: Optional path to a unified diff file. When provided, the CLI scans this file instead of base/head refs.
+    description: "Optional path to a unified diff file. When provided, the CLI scans this file instead of base/head refs."
     required: false
     default: ""
   config:
-    description: DiffWall policy file. If the file does not exist in the caller workspace, DiffWall uses its built-in defaults.
+    description: "DiffWall policy file. If the file does not exist in the caller workspace, DiffWall uses its built-in defaults."
     required: false
     default: rules/default.yml
   format:
-    description: Output format: text, json, or markdown.
+    description: "Output format: text, json, or markdown."
     required: false
     default: markdown
   fail_on_halt:
-    description: Exit non-zero when DiffWall routes the change to HALT.
+    description: "Exit non-zero when DiffWall routes the change to HALT."
     required: false
     default: "true"
   quiet:
-    description: Only print the final ALLOW, REVIEW, or HALT decision.
+    description: "Only print the final ALLOW, REVIEW, or HALT decision."
     required: false
     default: "false"
   github_token:
-    description: Optional token used to create or update the DiffWall PR comment.
+    description: "Optional token used to create or update the DiffWall PR comment."
     required: false
     default: ""
 
