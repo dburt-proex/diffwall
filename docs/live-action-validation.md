@@ -16,3 +16,4 @@ The validation is successful when:
 8. The reusable action pins Node.js and persists its own runtime log.
 9. Composite-action metadata uses parser-safe input expressions.
 10. Node setup occurs in the caller workflow before the composite action executes.
+11. The action uses underscore input names and `$GITHUB_ACTION_PATH` for execution.
