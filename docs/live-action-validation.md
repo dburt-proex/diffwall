@@ -12,3 +12,4 @@ The validation is successful when:
 4. The TypeScript and Python CI jobs complete successfully.
 5. The scan compares against the pull request's immutable base commit SHA.
 6. The workflow uploads its report before enforcing the verdict.
+7. The base commit is explicitly available in shallow-checkout environments.
