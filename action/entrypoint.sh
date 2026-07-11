@@ -57,7 +57,17 @@ SCAN_STATUS=${PIPESTATUS[0]}
 set -e
 
 if [[ -n "${DIFFWALL_COMMENT_TOKEN:-}" && "$FORMAT" == "markdown" && "$QUIET" != "true" ]]; then
+  set +e
   DIFFWALL_REPORT_PATH="$REPORT_PATH" GITHUB_TOKEN="$DIFFWALL_COMMENT_TOKEN" node "$ACTION_ROOT/dist/github-comment.js"
+  COMMENT_STATUS=$?
+  set -e
+
+  if [[ "$COMMENT_STATUS" -ne 0 ]]; then
+    echo "::warning::DiffWall could not publish the PR comment; the enforcement verdict and report remain valid."
+    if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+      cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
+    fi
+  fi
 elif [[ -n "${GITHUB_STEP_SUMMARY:-}" && "$FORMAT" == "markdown" && "$QUIET" != "true" ]]; then
   cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
 fi
