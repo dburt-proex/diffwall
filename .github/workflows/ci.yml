@@ -7,8 +7,12 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  pr-firewall:
+    name: TypeScript PR Firewall
     runs-on: ubuntu-latest
 
     steps:
@@ -24,8 +28,86 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Test
+      - name: Unit tests
         run: npm test
 
       - name: Demo scan
         run: npm run scan:demo
+
+      - name: Generate and verify route evidence
+        run: |
+          mkdir -p artifacts/pr-firewall
+
+          node dist/cli.js scan --diff test/fixtures/safe-doc-change.diff --format json > artifacts/pr-firewall/allow.json
+          grep -q '"route": "ALLOW"' artifacts/pr-firewall/allow.json
+
+          node dist/cli.js scan --diff test/fixtures/review-dependency-change.diff --format json > artifacts/pr-firewall/review.json
+          grep -q '"route": "REVIEW"' artifacts/pr-firewall/review.json
+
+          node dist/cli.js scan --diff test/fixtures/migration-drop-table.diff --format json > artifacts/pr-firewall/halt.json
+          grep -q '"route": "HALT"' artifacts/pr-firewall/halt.json
+
+      - name: Upload PR Firewall evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: diffwall-pr-firewall-evidence
+          path: artifacts/pr-firewall
+          if-no-files-found: error
+
+  action-firewall:
+    name: Python Action Firewall
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: packages/action-firewall
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: HALT demo
+        run: python demo/halt_demo.py
+
+      - name: Generate and verify CLI exit-code evidence
+        run: |
+          mkdir -p ../../artifacts/action-firewall
+
+          cat > /tmp/diffwall-allow.json <<'JSON'
+          {"id":"ci-allow","type":"read_file","target":"README.md"}
+          JSON
+          python -m diffwall.cli validate /tmp/diffwall-allow.json --json > ../../artifacts/action-firewall/allow.json
+          grep -q '"verdict": "ALLOW"' ../../artifacts/action-firewall/allow.json
+
+          cat > /tmp/diffwall-review.json <<'JSON'
+          {"id":"ci-review","type":"send_email","target":"customer@example.com","payload":"Status update"}
+          JSON
+          set +e
+          python -m diffwall.cli validate /tmp/diffwall-review.json --json > ../../artifacts/action-firewall/review.json
+          review_status=$?
+          set -e
+          test "$review_status" -eq 1
+          grep -q '"verdict": "REVIEW"' ../../artifacts/action-firewall/review.json
+
+          cat > /tmp/diffwall-halt.json <<'JSON'
+          {"id":"ci-halt","type":"delete_database","target":"production"}
+          JSON
+          set +e
+          python -m diffwall.cli validate /tmp/diffwall-halt.json --json > ../../artifacts/action-firewall/halt.json
+          halt_status=$?
+          set -e
+          test "$halt_status" -eq 2
+          grep -q '"verdict": "HALT"' ../../artifacts/action-firewall/halt.json
+
+      - name: Upload Action Firewall evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: diffwall-action-firewall-evidence
+          path: artifacts/action-firewall
+          if-no-files-found: error
