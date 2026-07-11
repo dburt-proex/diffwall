@@ -43,8 +43,9 @@ runs:
       shell: bash
       run: |
         echo "Starting DiffWall composite action"
-        bash "$GITHUB_ACTION_PATH/entrypoint.sh"
+        bash "$DIFFWALL_ACTION_PATH/entrypoint.sh"
       env:
+        DIFFWALL_ACTION_PATH: ${{ github.action_path }}
         DIFFWALL_BASE: ${{ inputs.base }}
         DIFFWALL_HEAD: ${{ inputs.head }}
         DIFFWALL_DIFF: ${{ inputs.diff }}
