@@ -15,7 +15,7 @@ export const defaultConfig: DiffWallConfig = {
 export function loadConfig(path?: string): DiffWallConfig {
   if (!path || !existsSync(path)) return defaultConfig;
   const parsed = parseSimpleYaml(readFileSync(path, "utf8"));
-  return {
+  const config: DiffWallConfig = {
     thresholds: {
       review: Number(parsed.thresholds?.review ?? defaultConfig.thresholds.review),
       halt: Number(parsed.thresholds?.halt ?? defaultConfig.thresholds.halt)
@@ -24,6 +24,25 @@ export function loadConfig(path?: string): DiffWallConfig {
     protectedPaths: parsed.protectedPaths ?? defaultConfig.protectedPaths,
     haltPatterns: parsed.haltPatterns ?? defaultConfig.haltPatterns
   };
+  validateConfig(config, path);
+  return config;
+}
+
+/**
+ * Reject policy files that would silently misroute changes. An out-of-range or
+ * inverted threshold makes a routing tier unreachable, so we fail loudly rather
+ * than enforce a broken policy.
+ */
+export function validateConfig(config: DiffWallConfig, source = "config"): void {
+  const { review, halt } = config.thresholds;
+  for (const [name, value] of [["review", review], ["halt", halt]] as const) {
+    if (!Number.isFinite(value) || value < 0 || value > 100) {
+      throw new Error(`Invalid DiffWall config (${source}): thresholds.${name} must be a number between 0 and 100, got ${value}`);
+    }
+  }
+  if (halt < review) {
+    throw new Error(`Invalid DiffWall config (${source}): thresholds.halt (${halt}) must be >= thresholds.review (${review})`);
+  }
 }
 
 function parseSimpleYaml(raw: string): Partial<DiffWallConfig> {

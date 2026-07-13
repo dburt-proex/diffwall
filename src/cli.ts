@@ -18,26 +18,56 @@ interface CliOptions {
   quiet?: boolean;
 }
 
-const options = parseArgs(process.argv.slice(2));
+const VALID_FORMATS = new Set(["text", "json", "markdown"]);
 
-if (options.command !== "scan") {
-  printHelp();
-  process.exit(options.command ? 1 : 0);
+main();
+
+function main(): void {
+  let options: CliOptions;
+  try {
+    options = parseArgs(process.argv.slice(2));
+  } catch (error) {
+    fail(error);
+    return;
+  }
+
+  if (options.command !== "scan") {
+    printHelp();
+    process.exit(options.command ? 1 : 0);
+  }
+
+  if (!VALID_FORMATS.has(options.format)) {
+    fail(new Error(`Unknown --format "${options.format}" (expected text, json, or markdown)`));
+    return;
+  }
+
+  let result;
+  try {
+    const config = loadConfig(options.config);
+    const diff = options.diff ? readFileSync(options.diff, "utf8") : readGitDiff(options);
+    result = scanDiff(diff, config);
+  } catch (error) {
+    fail(error);
+    return;
+  }
+
+  if (options.quiet) process.stdout.write(`${result.route}\n`);
+  else if (options.format === "json") process.stdout.write(toJson(result));
+  else if (options.format === "markdown") process.stdout.write(toMarkdown(result));
+  else {
+    process.stdout.write(`DiffWall: ${result.route}\nRisk score: ${result.score} / 100\n`);
+    for (const finding of result.findings) process.stdout.write(`  +${finding.score} ${finding.message}\n`);
+  }
+
+  if (options.failOnHalt && result.route === "HALT") process.exit(2);
 }
 
-const config = loadConfig(options.config);
-const diff = options.diff ? readFileSync(options.diff, "utf8") : readGitDiff(options);
-const result = scanDiff(diff, config);
-
-if (options.quiet) process.stdout.write(`${result.route}\n`);
-else if (options.format === "json") process.stdout.write(toJson(result));
-else if (options.format === "markdown") process.stdout.write(toMarkdown(result));
-else {
-  process.stdout.write(`DiffWall: ${result.route}\nRisk score: ${result.score} / 100\n`);
-  for (const finding of result.findings) process.stdout.write(`  +${finding.score} ${finding.message}\n`);
+/** Report an operational error and exit non-zero (distinct from HALT=2). */
+function fail(error: unknown): never {
+  const message = error instanceof Error ? error.message : String(error);
+  process.stderr.write(`DiffWall error: ${message}\n`);
+  process.exit(1);
 }
-
-if (options.failOnHalt && result.route === "HALT") process.exit(2);
 
 function parseArgs(args: string[]): CliOptions {
   const options: CliOptions = { command: args[0], format: "text" };
