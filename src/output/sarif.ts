@@ -24,8 +24,7 @@ function toLocations(finding: Finding, fallbackFiles: string[]): Array<Record<st
   }
   return files.map((path) => ({
     physicalLocation: {
-      artifactLocation: { uri: path },
-      region: { startLine: 1 }
+      artifactLocation: { uri: path }
     }
   }));
 }
