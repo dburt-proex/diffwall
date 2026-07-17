@@ -1,0 +1,42 @@
+# DiffWall for GitLab CI
+#
+# Runs DiffWall against a merge request's diff (target branch base -> HEAD)
+# and fails the job only when the route is HALT.
+#
+# Required GitLab CI/CD variables (all provided automatically for
+# merge_request_event pipelines when "Merge results pipelines" or standard
+# MR pipelines are used):
+#   CI_MERGE_REQUEST_DIFF_BASE_SHA   - base commit of the merge request diff
+#   CI_COMMIT_SHA                    - head commit being scanned
+#
+# This job only runs on merge request pipelines. Adjust the `rules` block if
+# your project uses a different pipeline source.
+
+diffwall:
+  stage: test
+  image: node:20
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  variables:
+    GIT_DEPTH: 0
+  before_script:
+    - git fetch origin "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --depth 1 || true
+  script:
+    - git clone --depth 1 https://github.com/dburt-proex/diffwall.git /tmp/diffwall
+    - cd /tmp/diffwall
+    - npm install --no-audit --no-fund
+    - npm run build
+    - cd "$CI_PROJECT_DIR"
+    - |
+      node /tmp/diffwall/dist/cli.js scan \
+        --base "$CI_MERGE_REQUEST_DIFF_BASE_SHA" \
+        --head "$CI_COMMIT_SHA" \
+        --config rules/default.yml \
+        --format markdown \
+        --fail-on-halt \
+        | tee diffwall-report.md
+  artifacts:
+    when: always
+    paths:
+      - diffwall-report.md
+    expire_in: 30 days
