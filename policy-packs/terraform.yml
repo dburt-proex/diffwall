@@ -1,0 +1,27 @@
+thresholds:
+  review: 40
+  halt: 75
+
+ignorePaths:
+  - "docs/**"
+  - "*.md"
+
+protectedPaths:
+  - "*.tf"
+  - "*.tfvars"
+  - "terraform/**"
+  - "**/*.tf"
+  - "**/*.tfvars"
+  - ".github/workflows/**"
+
+haltPatterns:
+  - "terraform destroy"
+  - "force_destroy = true"
+  - "force_destroy: true"
+  - "prevent_destroy = false"
+  - "skip_final_snapshot = true"
+  - "0.0.0.0/0"
+  - "DROP TABLE"
+  - "TRUNCATE TABLE"
+  - "rm -rf"
+  - "chmod 777"

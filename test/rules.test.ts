@@ -181,4 +181,30 @@ describe("rule modules", () => {
       })
     ]));
   });
+
+  it("matches Terraform policy pack protected infrastructure paths", () => {
+    const config = loadConfig(fileURLToPath(new URL("../policy-packs/terraform.yml", import.meta.url)));
+    const findings = sensitiveFilesRule([
+      diffFile("main.tf"),
+      diffFile("terraform/network/vpc.tf"),
+      diffFile("modules/storage/variables.tfvars"),
+      diffFile(".github/workflows/deploy.yml")
+    ], config);
+
+    expect(findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "protected-path-change",
+        files: [
+          "main.tf",
+          "terraform/network/vpc.tf",
+          "modules/storage/variables.tfvars",
+          ".github/workflows/deploy.yml"
+        ]
+      }),
+      expect.objectContaining({
+        ruleId: "github-workflow-change",
+        files: [".github/workflows/deploy.yml"]
+      })
+    ]));
+  });
 });
