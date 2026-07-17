@@ -1,0 +1,57 @@
+# DiffWall self-scan policy.
+#
+# DiffWall's own repository necessarily contains the very patterns it detects:
+#   - detector definitions (src/rules/**, diffwall/rules.py) embed keywords like
+#     "child_process", secret regexes, and SQL verbs;
+#   - the policy files (rules/**) list halt patterns such as "DROP TABLE";
+#   - the test/demo/example fixtures carry deliberate attack strings.
+#
+# Scanning those paths against the content rules would always HALT, so this
+# repo-local config ignores them while STILL enforcing the full policy on the
+# real application logic (src/cli.ts, config.ts, git.ts, scanner.ts, output/**,
+# github-comment.ts, and the Python engine/models/cli/report). Thresholds,
+# protected paths, and halt patterns are identical to rules/default.yml — the
+# shipped default stays strict for every other consumer.
+thresholds:
+  review: 40
+  halt: 75
+
+ignorePaths:
+  - "docs/**"
+  - "*.md"
+  - "rules/**"
+  - "src/rules/**"
+  - "test/**"
+  - "demo/**"
+  - "packages/action-firewall/diffwall/rules.py"
+  - "packages/action-firewall/tests/**"
+  - "packages/action-firewall/examples/**"
+  - "packages/action-firewall/demo/**"
+
+protectedPaths:
+  - ".github/workflows/**"
+  - "package.json"
+  - "package-lock.json"
+  - "pnpm-lock.yaml"
+  - "yarn.lock"
+  - "requirements.txt"
+  - "pyproject.toml"
+  - "go.mod"
+  - "go.sum"
+  - "src/auth/**"
+  - "src/security/**"
+  - "auth/**"
+  - "security/**"
+  - "billing/**"
+  - "db/migrations/**"
+  - "migrations/**"
+
+haltPatterns:
+  - "DROP TABLE"
+  - "TRUNCATE TABLE"
+  - "rm -rf"
+  - "chmod 777"
+  - "rejectUnauthorized: false"
+  - "verify: false"
+  - "verify=False"
+  - "NODE_TLS_REJECT_UNAUTHORIZED=0"

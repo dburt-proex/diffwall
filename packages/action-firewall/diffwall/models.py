@@ -43,12 +43,13 @@ class Action:
 
     @classmethod
     def from_dict(cls, d: dict) -> "Action":
+        params = d.get("params")
         return cls(
             id=str(d.get("id", "")),
             type=str(d.get("type", "")).strip().lower(),
             target=str(d.get("target", "")),
             payload=str(d.get("payload", "")),
-            params=d.get("params", {}) or {},
+            params=params if isinstance(params, dict) else {},
         )
 
     def _concat(self) -> str:

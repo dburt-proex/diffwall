@@ -1,6 +1,6 @@
 import type { Rule } from "../types.js";
 
-const dynamicExec = /\b(eval|Function)\s*\(|child_process|execSync|spawnSync|pickle\.loads|yaml\.load\s*\(/;
+const dynamicExec = /\b(eval|Function)\s*\(|child_process|execSync|spawnSync|os\.system\s*\(|subprocess\.(Popen|call|run|check_output|check_call)|pickle\.loads|yaml\.load\s*\(/;
 const shellPipe = /\bcurl\b.+\|\s*(sh|bash)|\bwget\b.+\|\s*(sh|bash)/;
 const network = /\b(fetch|axios|request|http\.request|https\.request|requests\.(get|post|put)|curl)\b/;
 const envAccess = /process\.env|os\.environ|Deno\.env|import\.meta\.env/;

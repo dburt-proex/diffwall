@@ -40,7 +40,7 @@ export async function updatePullRequestComment(): Promise<void> {
 
   const apiBase = process.env.GITHUB_API_URL ?? "https://api.github.com";
   const commentsUrl = `${apiBase}/repos/${repository}/issues/${issueNumber}/comments`;
-  const comments = await request<GitHubComment[]>(commentsUrl, token, { method: "GET" });
+  const comments = await listAllComments(commentsUrl, token);
   const existing = comments.find((comment) => comment.body?.includes(marker));
 
   if (existing) {
@@ -59,7 +59,36 @@ export async function updatePullRequestComment(): Promise<void> {
   process.stdout.write(`Created DiffWall PR comment #${created.id}\n`);
 }
 
-async function request<T>(url: string, token: string, init: RequestInit): Promise<T> {
+/**
+ * Fetch every page of PR comments. Without following pagination a busy PR
+ * (>30 comments) would hide the existing DiffWall comment and cause a new
+ * duplicate to be posted on each run.
+ */
+async function listAllComments(commentsUrl: string, token: string): Promise<GitHubComment[]> {
+  const all: GitHubComment[] = [];
+  const separator = commentsUrl.includes("?") ? "&" : "?";
+  let url: string | undefined = `${commentsUrl}${separator}per_page=100`;
+
+  while (url) {
+    const response = await requestRaw(url, token, { method: "GET" });
+    all.push(...((await response.json()) as GitHubComment[]));
+    url = nextPageUrl(response.headers.get("link"));
+  }
+
+  return all;
+}
+
+/** Extract the `rel="next"` URL from a GitHub Link header, if present. */
+function nextPageUrl(linkHeader: string | null): string | undefined {
+  if (!linkHeader) return undefined;
+  for (const part of linkHeader.split(",")) {
+    const match = part.match(/<([^>]+)>;\s*rel="next"/);
+    if (match) return match[1];
+  }
+  return undefined;
+}
+
+async function requestRaw(url: string, token: string, init: RequestInit): Promise<Response> {
   const response = await fetch(url, {
     ...init,
     headers: {
@@ -76,6 +105,11 @@ async function request<T>(url: string, token: string, init: RequestInit): Promis
     throw new Error(`GitHub API request failed: ${response.status} ${details}`);
   }
 
+  return response;
+}
+
+async function request<T>(url: string, token: string, init: RequestInit): Promise<T> {
+  const response = await requestRaw(url, token, init);
   return response.json() as Promise<T>;
 }
 

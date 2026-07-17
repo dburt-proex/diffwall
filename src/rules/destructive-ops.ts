@@ -2,8 +2,9 @@ import type { Rule } from "../types.js";
 
 const destructivePatterns = [
   { id: "drop-table", pattern: /\bDROP\s+TABLE\b/i, message: "Destructive SQL migration detected" },
+  { id: "drop-database", pattern: /\bDROP\s+(DATABASE|SCHEMA)\b/i, message: "Destructive SQL database/schema drop detected" },
   { id: "truncate-table", pattern: /\bTRUNCATE\s+TABLE\b/i, message: "Destructive SQL truncation detected" },
-  { id: "broad-delete", pattern: /\bDELETE\s+FROM\s+\w+\s*;?\s*$/i, message: "Broad SQL delete detected" },
+  { id: "broad-delete", pattern: /\bDELETE\s+FROM\s+[\w.`"[\]]+\s*(;|\bWHERE\s+(1\s*=\s*1|true)\b)?\s*$/i, message: "Broad SQL delete detected" },
   { id: "rm-rf", pattern: /\brm\s+-rf\s+(\/|\$|~|\*)/i, message: "Dangerous shell deletion detected" },
   { id: "chmod-777", pattern: /\bchmod\s+777\b/i, message: "Unsafe permission change detected" },
   { id: "tls-disabled", pattern: /rejectUnauthorized\s*:\s*false|verify\s*=\s*False|verify:\s*false|NODE_TLS_REJECT_UNAUTHORIZED\s*=\s*["']?0/i, message: "TLS verification disabled" }

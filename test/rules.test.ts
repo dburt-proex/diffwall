@@ -99,6 +99,40 @@ describe("rule modules", () => {
     ]);
   });
 
+  it("halts destructive database/schema drops", () => {
+    const findings = destructiveOpsRule([
+      diffFile("migrations/001.sql", ["DROP DATABASE production;"])
+    ], defaultConfig);
+
+    expect(findings).toEqual([
+      expect.objectContaining({ ruleId: "drop-database", severity: "critical", score: 100, halt: true })
+    ]);
+  });
+
+  it("halts a schema-qualified broad delete", () => {
+    const findings = destructiveOpsRule([
+      diffFile("migrations/002.sql", ["DELETE FROM app.users;"])
+    ], defaultConfig);
+
+    expect(findings.some((f) => f.ruleId === "broad-delete" && f.halt)).toBe(true);
+  });
+
+  it("does not flag a scoped delete with a real WHERE clause", () => {
+    const findings = destructiveOpsRule([
+      diffFile("migrations/003.sql", ["DELETE FROM users WHERE id = 42;"])
+    ], defaultConfig);
+
+    expect(findings.some((f) => f.ruleId === "broad-delete")).toBe(false);
+  });
+
+  it("flags os.system and subprocess dynamic execution", () => {
+    const system = networkAndExecRule([diffFile("run.py", ["os.system(user_input)"])], defaultConfig);
+    expect(system.some((f) => f.ruleId === "dynamic-execution-added")).toBe(true);
+
+    const sub = networkAndExecRule([diffFile("run.py", ["subprocess.Popen(cmd, shell=True)"])], defaultConfig);
+    expect(sub.some((f) => f.ruleId === "dynamic-execution-added")).toBe(true);
+  });
+
   it("detects network egress near environment access", () => {
     const findings = networkAndExecRule([
       diffFile("src/export.ts", [
