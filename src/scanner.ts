@@ -1,3 +1,4 @@
+import { matchOwners, suggestedReviewers, type CodeownersEntry } from "./codeowners.js";
 import { matchesAny } from "./config.js";
 import { parseUnifiedDiff } from "./git.js";
 import { defaultRules } from "./rules/index.js";
@@ -11,7 +12,7 @@ function looksLikeDiff(diff: string): boolean {
   return diff.trim().length > 0 && diffMarker.test(diff);
 }
 
-export function scanDiff(diff: string, config: DiffWallConfig): ScanResult {
+export function scanDiff(diff: string, config: DiffWallConfig, codeowners: CodeownersEntry[] = []): ScanResult {
   const parsed = parseUnifiedDiff(diff);
   const files = parsed.filter((file) => !matchesAny(file.path, config.ignorePaths));
   const findings = defaultRules.flatMap((rule) => rule(files, config));
@@ -28,5 +29,14 @@ export function scanDiff(diff: string, config: DiffWallConfig): ScanResult {
     findings.push(failSafe);
   }
 
-  return scoreFindings(files, findings, config);
+  const result = scoreFindings(files, findings, config);
+
+  // Route the findings' triggered files through CODEOWNERS to suggest who
+  // should review a REVIEW/HALT change. Absent a CODEOWNERS file this is a
+  // no-op and yields empty owner data.
+  const triggeredFiles = [...new Set(findings.flatMap((finding) => finding.files ?? []))];
+  const matches = matchOwners(triggeredFiles, codeowners);
+  result.owners = { matches, suggestedReviewers: suggestedReviewers(matches) };
+
+  return result;
 }

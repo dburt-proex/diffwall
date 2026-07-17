@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- CODEOWNERS-aware routing: maps files that triggered a finding to their `.github/CODEOWNERS` (or `CODEOWNERS` / `docs/CODEOWNERS`) owners and adds suggested reviewers to the Markdown and JSON reports.
+
 ## v0.1.0
 
 Initial action-first release of DiffWall.

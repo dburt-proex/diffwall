@@ -32,6 +32,7 @@ export function toMarkdown(result: ScanResult): string {
 
   lines.push("### Route", "", `\`${result.route}\``, "", "### Suggested review focus", "");
   lines.push(...reviewFocus(result));
+  lines.push(...ownerSuggestions(result));
   return `${lines.join("\n")}\n`;
 }
 
@@ -44,4 +45,13 @@ function routeMessage(route: ScanResult["route"]): string {
 function reviewFocus(result: ScanResult): string[] {
   if (result.findings.length === 0) return ["- Standard correctness review"];
   return result.findings.slice(0, 6).map((finding) => `- ${finding.message}`);
+}
+
+function ownerSuggestions(result: ScanResult): string[] {
+  const { matches, suggestedReviewers } = result.owners;
+  if (matches.length === 0) return [];
+
+  const lines = ["", "### Suggested reviewers (CODEOWNERS)", "", `${suggestedReviewers.join(", ")}`, "", "| File | Owners |", "|---|---|"];
+  for (const match of matches) lines.push(`| ${match.file} | ${match.owners.join(", ")} |`);
+  return lines;
 }
