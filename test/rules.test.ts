@@ -4,6 +4,7 @@ import { defaultConfig, loadConfig } from "../src/config.js";
 import { authAndSecretsRule } from "../src/rules/auth-and-secrets.js";
 import { dependencyChangesRule } from "../src/rules/dependency-changes.js";
 import { destructiveOpsRule } from "../src/rules/destructive-ops.js";
+import { githubActionsRule } from "../src/rules/github-actions.js";
 import { networkAndExecRule } from "../src/rules/network-and-exec.js";
 import { sensitiveFilesRule } from "../src/rules/sensitive-files.js";
 import type { DiffFile } from "../src/types.js";
@@ -150,6 +151,71 @@ describe("rule modules", () => {
         files: ["src/export.ts"]
       })
     ]);
+  });
+
+  it("flags untrusted PR title/body used near shell execution in a workflow", () => {
+    const findings = githubActionsRule([
+      diffFile(".github/workflows/pr-comment.yml", [
+        "on: pull_request",
+        "        run: |",
+        "          echo \"${{ github.event.pull_request.title }}\" >> summary.txt"
+      ])
+    ], defaultConfig);
+
+    expect(findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "github-actions-untrusted-pr-text-in-shell",
+        severity: "high",
+        score: 35,
+        files: [".github/workflows/pr-comment.yml"]
+      })
+    ]));
+  });
+
+  it("halts pull_request_target workflows that check out untrusted PR head refs", () => {
+    const findings = githubActionsRule([
+      diffFile(".github/workflows/pr-comment.yml", [
+        "on:",
+        "  pull_request_target:",
+        "      - uses: actions/checkout@v4",
+        "        with:",
+        "          ref: ${{ github.event.pull_request.head.sha }}"
+      ])
+    ], defaultConfig);
+
+    expect(findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "github-actions-pull-request-target-untrusted-checkout",
+        severity: "critical",
+        score: 100,
+        halt: true,
+        files: [".github/workflows/pr-comment.yml"]
+      })
+    ]));
+  });
+
+  it("halts workflows that expose secrets too broadly", () => {
+    const findings = githubActionsRule([
+      diffFile(".github/workflows/deploy.yml", ["    secrets: inherit"])
+    ], defaultConfig);
+
+    expect(findings).toEqual([
+      expect.objectContaining({
+        ruleId: "github-actions-broad-secret-exposure",
+        severity: "critical",
+        score: 100,
+        halt: true,
+        files: [".github/workflows/deploy.yml"]
+      })
+    ]);
+  });
+
+  it("does not flag a benign workflow change without unsafe patterns", () => {
+    const findings = githubActionsRule([
+      diffFile(".github/workflows/build.yml", ["      - run: npm run build"])
+    ], defaultConfig);
+
+    expect(findings).toHaveLength(0);
   });
 
   it("matches Node/Express policy pack protected middleware, guards, and workflow/package files", () => {
