@@ -181,4 +181,30 @@ describe("rule modules", () => {
       })
     ]));
   });
+
+  it("matches Python/Django policy pack protected auth, permissions, middleware, migrations, and settings files", () => {
+    const config = loadConfig(fileURLToPath(new URL("../policy-packs/python-django.yml", import.meta.url)));
+    const findings = sensitiveFilesRule([
+      diffFile("app/auth/backends.py"),
+      diffFile("app/permissions.py"),
+      diffFile("app/middleware.py"),
+      diffFile("app/migrations/0001_initial.py"),
+      diffFile("project/settings.py"),
+      diffFile("requirements.txt")
+    ], config);
+
+    expect(findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "protected-path-change",
+        files: [
+          "app/auth/backends.py",
+          "app/permissions.py",
+          "app/middleware.py",
+          "app/migrations/0001_initial.py",
+          "project/settings.py",
+          "requirements.txt"
+        ]
+      })
+    ]));
+  });
 });
