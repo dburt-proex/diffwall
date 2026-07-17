@@ -74,7 +74,7 @@ Forked pull requests may receive a read-only token depending on repository setti
 | `head` | `HEAD` | Head git ref for the diff. |
 | `diff` | empty | Optional path to a unified diff file. Overrides base/head. |
 | `config` | `rules/default.yml` | Path to caller-repo policy file. If missing, built-in defaults are used. |
-| `format` | `markdown` | `text`, `json`, or `markdown`. |
+| `format` | `markdown` | `text`, `json`, `markdown`, or `sarif`. |
 | `fail_on_halt` | `true` | Exit non-zero when route is `HALT`. |
 | `quiet` | `false` | Print only the final route decision. |
 | `github_token` | empty | Optional token for PR comment updates. |
