@@ -51,7 +51,15 @@ function ownerSuggestions(result: ScanResult): string[] {
   const { matches, suggestedReviewers } = result.owners;
   if (matches.length === 0) return [];
 
-  const lines = ["", "### Suggested reviewers (CODEOWNERS)", "", `${suggestedReviewers.join(", ")}`, "", "| File | Owners |", "|---|---|"];
+  const lines = [
+    "",
+    "### Suggested reviewers (CODEOWNERS)",
+    "",
+    suggestedReviewers.join(", "),
+    "",
+    "| File | Owners |",
+    "|---|---|"
+  ];
   for (const match of matches) lines.push(`| ${match.file} | ${match.owners.join(", ")} |`);
   return lines;
 }

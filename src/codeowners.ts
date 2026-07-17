@@ -75,7 +75,8 @@ export function suggestedReviewers(matches: OwnerMatch[]): string[] {
  */
 function patternToRegExp(pattern: string): RegExp {
   let normalized = pattern.startsWith("/") ? pattern.slice(1) : pattern;
-  const anchored = pattern.startsWith("/") || pattern.slice(0, -1).includes("/");
+  const withoutTrailingSlash = pattern.endsWith("/") ? pattern.slice(0, -1) : pattern;
+  const anchored = pattern.startsWith("/") || withoutTrailingSlash.includes("/");
   if (normalized.endsWith("/")) normalized += "**";
 
   const regexBody = normalized
