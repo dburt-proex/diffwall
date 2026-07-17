@@ -23,6 +23,7 @@ echo "npm: $(npm --version)"
 case "$FORMAT" in
   json) REPORT_PATH="$CALLER_WORKSPACE/diffwall-report.json" ;;
   text) REPORT_PATH="$CALLER_WORKSPACE/diffwall-report.txt" ;;
+  sarif) REPORT_PATH="$CALLER_WORKSPACE/diffwall-report.sarif" ;;
   markdown|*) REPORT_PATH="$CALLER_WORKSPACE/diffwall-report.md" ;;
 esac
 

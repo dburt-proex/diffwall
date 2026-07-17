@@ -12,7 +12,7 @@
 
 ## v0.2
 
-- PR comment updater
+- PR comment updater (done — see `src/github-comment.ts`)
 - SARIF export
 - CODEOWNERS-aware routing
 - Better monorepo path ownership
