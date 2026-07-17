@@ -1,13 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import type { OwnerMatch } from "./types.js";
 
 export interface CodeownersEntry {
   pattern: string;
-  owners: string[];
-}
-
-export interface OwnerMatch {
-  file: string;
   owners: string[];
 }
 
