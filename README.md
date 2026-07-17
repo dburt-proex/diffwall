@@ -169,6 +169,10 @@ npx tsx src/cli.ts scan --base origin/main --head HEAD --format json --fail-on-h
 - Source changed without test changes
 - Test removal
 
+### CODEOWNERS-aware routing
+
+If a `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS` file exists in the repository, DiffWall maps every file that triggered a finding to its CODEOWNERS owners and adds a suggested-reviewer list to the Markdown and JSON reports. It follows standard CODEOWNERS/gitignore pattern semantics (last matching pattern wins) and is a no-op when no CODEOWNERS file is present.
+
 ## Action Firewall
 
 The Action Firewall is the Python CASA proof: a stdlib-only validator that intercepts proposed AI/agent actions and returns an audit-ready decision.
@@ -212,7 +216,6 @@ The Action Firewall currently includes rules for irreversible destruction, finan
 
 - Publish a pinned action release after HALT-path validation
 - Add SARIF export
-- Add CODEOWNERS-aware routing
 - Add policy packs for Node, Python, Rails, Django, Terraform, and GitHub Actions
 - Add runtime agent middleware for action validation
 - Add audit log export

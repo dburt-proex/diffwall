@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
+import { loadCodeowners } from "./codeowners.js";
 import { loadConfig } from "./config.js";
 import { readGitDiff } from "./git.js";
 import { toJson } from "./output/json.js";
@@ -46,7 +47,8 @@ function main(): void {
   try {
     const config = loadConfig(options.config);
     const diff = options.diff ? readFileSync(options.diff, "utf8") : readGitDiff(options);
-    result = scanDiff(diff, config);
+    const codeowners = loadCodeowners();
+    result = scanDiff(diff, config, codeowners);
   } catch (error) {
     fail(error);
     return;
