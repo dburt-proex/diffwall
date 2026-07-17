@@ -126,6 +126,10 @@ jobs:
 
 This invocation has been validated in a real pull-request workflow. Pin a release tag rather than `main` before making DiffWall a required production merge gate.
 
+### GitLab CI quickstart
+
+DiffWall also runs outside GitHub Actions. See [`examples/gitlab-ci.yml`](examples/gitlab-ci.yml) and [`docs/gitlab-ci.md`](docs/gitlab-ci.md) for a merge-request pipeline job that scans `CI_MERGE_REQUEST_DIFF_BASE_SHA` → `CI_COMMIT_SHA` and fails the job only when the route is `HALT`.
+
 ### Local development
 
 ```bash
