@@ -1,0 +1,13 @@
+diff --git a/.github/workflows/build.yml b/.github/workflows/build.yml
+index 1111111..2222222 100644
+--- a/.github/workflows/build.yml
++++ b/.github/workflows/build.yml
+@@ -6,6 +6,9 @@ jobs:
+     steps:
+       - uses: actions/checkout@v4
+       - uses: actions/setup-node@v4
++        with:
++          node-version: 20
++      - run: npm ci
+       - run: npm run build
+       - run: npm test
