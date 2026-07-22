@@ -1,0 +1,7 @@
+diff --git a/project/settings.py b/project/settings.py
+index 1111111..2222222 100644
+--- a/project/settings.py
++++ b/project/settings.py
+@@ -12,3 +12,3 @@
+-DEBUG = False
++DEBUG = True

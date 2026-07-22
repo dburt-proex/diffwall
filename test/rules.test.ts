@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { defaultConfig, loadConfig } from "../src/config.js";
 import { authAndSecretsRule } from "../src/rules/auth-and-secrets.js";
+import { configuredHaltPatternsRule } from "../src/rules/configured-halt-patterns.js";
 import { dependencyChangesRule } from "../src/rules/dependency-changes.js";
 import { destructiveOpsRule } from "../src/rules/destructive-ops.js";
 import { networkAndExecRule } from "../src/rules/network-and-exec.js";
@@ -99,6 +100,24 @@ describe("rule modules", () => {
     ]);
   });
 
+  it("halts added lines that match configured halt patterns", () => {
+    const config = { ...defaultConfig, haltPatterns: ["DEBUG = True"] };
+    const findings = configuredHaltPatternsRule([
+      diffFile("project/settings.py", ["DEBUG = true"])
+    ], config);
+
+    expect(findings).toEqual([
+      expect.objectContaining({
+        ruleId: "configured-halt-pattern",
+        severity: "critical",
+        score: 100,
+        halt: true,
+        files: ["project/settings.py"],
+        evidence: ["DEBUG = True"]
+      })
+    ]);
+  });
+
   it("halts destructive database/schema drops", () => {
     const findings = destructiveOpsRule([
       diffFile("migrations/001.sql", ["DROP DATABASE production;"])
@@ -190,6 +209,9 @@ describe("rule modules", () => {
       diffFile("app/middleware.py"),
       diffFile("app/migrations/0001_initial.py"),
       diffFile("project/settings.py"),
+      diffFile("manage.py"),
+      diffFile("wsgi.py"),
+      diffFile("asgi.py"),
       diffFile("requirements.txt")
     ], config);
 
@@ -202,6 +224,9 @@ describe("rule modules", () => {
           "app/middleware.py",
           "app/migrations/0001_initial.py",
           "project/settings.py",
+          "manage.py",
+          "wsgi.py",
+          "asgi.py",
           "requirements.txt"
         ]
       })

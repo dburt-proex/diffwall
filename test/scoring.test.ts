@@ -36,4 +36,13 @@ describe("DiffWall scoring", () => {
     const result = scanDiff(fixture("python-django-halt-migration.diff"), config);
     expect(result.route).toBe("HALT");
   });
+
+  it("halts a Django-specific configured halt pattern", () => {
+    const config = loadConfig(fileURLToPath(new URL("../policy-packs/python-django.yml", import.meta.url)));
+    const result = scanDiff(fixture("python-django-halt-debug.diff"), config);
+    expect(result.route).toBe("HALT");
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: "configured-halt-pattern", halt: true })
+    ]));
+  });
 });
