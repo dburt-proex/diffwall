@@ -1,0 +1,19 @@
+diff --git a/.github/workflows/pr-comment.yml b/.github/workflows/pr-comment.yml
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/.github/workflows/pr-comment.yml
+@@ -0,0 +1,13 @@
++name: PR Comment
++on:
++  pull_request_target:
++jobs:
++  comment:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++        with:
++          ref: ${{ github.event.pull_request.head.sha }}
++      - name: Post PR title
++        run: |
++          echo "${{ github.event.pull_request.title }}" >> summary.txt

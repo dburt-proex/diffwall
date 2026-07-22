@@ -35,6 +35,11 @@ export interface DiffWallConfig {
   haltPatterns: string[];
 }
 
+export interface OwnerMatch {
+  file: string;
+  owners: string[];
+}
+
 export interface ScanResult {
   route: Route;
   score: number;
@@ -46,6 +51,10 @@ export interface ScanResult {
     additions: number;
     deletions: number;
     changedFiles: string[];
+  };
+  owners: {
+    matches: OwnerMatch[];
+    suggestedReviewers: string[];
   };
 }
 

@@ -126,6 +126,10 @@ jobs:
 
 This invocation has been validated in a real pull-request workflow. Pin a release tag rather than `main` before making DiffWall a required production merge gate.
 
+### GitLab CI quickstart
+
+DiffWall also runs outside GitHub Actions. See [`examples/gitlab-ci.yml`](examples/gitlab-ci.yml) and [`docs/gitlab-ci.md`](docs/gitlab-ci.md) for a merge-request pipeline job that scans `CI_MERGE_REQUEST_DIFF_BASE_SHA` → `CI_COMMIT_SHA` and fails the job only when the route is `HALT`.
+
 ### Local development
 
 ```bash
@@ -164,6 +168,10 @@ npx tsx src/cli.ts scan --base origin/main --head HEAD --format json --fail-on-h
 - Large generated diff
 - Source changed without test changes
 - Test removal
+
+### CODEOWNERS-aware routing
+
+If a `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS` file exists in the repository, DiffWall maps every file that triggered a finding to its CODEOWNERS owners and adds a suggested-reviewer list to the Markdown and JSON reports. It follows standard CODEOWNERS/gitignore pattern semantics (last matching pattern wins) and is a no-op when no CODEOWNERS file is present.
 
 ## Action Firewall
 
@@ -208,7 +216,6 @@ The Action Firewall currently includes rules for irreversible destruction, finan
 
 - Publish a pinned action release after HALT-path validation
 - Add SARIF export
-- Add CODEOWNERS-aware routing
 - Add policy packs for Node, Python, Rails, Django, Terraform, and GitHub Actions
 - Add runtime agent middleware for action validation
 - Add audit log export

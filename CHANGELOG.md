@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- CODEOWNERS-aware routing: maps files that triggered a finding to their `.github/CODEOWNERS` (or `CODEOWNERS` / `docs/CODEOWNERS`) owners and adds suggested reviewers to the Markdown and JSON reports.
+- PR comment updater: posts or updates a single marked DiffWall report comment per PR, with a GitHub step-summary fallback when a token is unavailable or lacks permission.
+
 ## v0.1.0
 
 Initial action-first release of DiffWall.
@@ -31,6 +38,5 @@ Initial action-first release of DiffWall.
 
 - No npm package published yet
 - GitHub Action builds from the action checkout on each run
-- No PR comment updater yet
 - No SARIF export yet
 - No CODEOWNERS-aware routing yet

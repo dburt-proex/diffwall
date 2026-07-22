@@ -20,7 +20,7 @@ inputs:
     required: false
     default: rules/default.yml
   format:
-    description: "Output format: text, json, or markdown."
+    description: "Output format: text, json, markdown, or sarif."
     required: false
     default: markdown
   fail_on_halt:

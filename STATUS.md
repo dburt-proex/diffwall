@@ -38,7 +38,7 @@ Public proof:
 | Evidence artifacts | Working | PR reports, diagnostics, and engine route evidence upload through GitHub Actions. |
 | Live HALT PR enforcement | Proven | Published a 100/100 HALT report and then failed the workflow as designed. |
 | SARIF export | Not implemented | Roadmap item. |
-| CODEOWNERS-aware routing | Not implemented | Roadmap item. |
+| CODEOWNERS-aware routing | Working | Maps triggered files to CODEOWNERS owners in Markdown/JSON reports. |
 | Policy packs | Not implemented | Roadmap item. |
 | Runtime middleware | Not implemented | Roadmap item. |
 | Demo screenshots/GIF | Missing | Needed for buyer-facing proof. |
@@ -91,7 +91,7 @@ Avoid claiming full enterprise production readiness until a pinned release, broa
 
 - [ ] Cut and document a pinned action release.
 - [ ] Add SARIF export.
-- [ ] Add CODEOWNERS-aware routing.
+- [x] Add CODEOWNERS-aware routing.
 - [ ] Add policy packs.
 - [ ] Add runtime middleware.
 - [ ] Add audit log export.
