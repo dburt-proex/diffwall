@@ -1,0 +1,44 @@
+thresholds:
+  review: 40
+  halt: 75
+
+ignorePaths:
+  - "docs/**"
+  - "*.md"
+
+protectedPaths:
+  - ".github/workflows/**"
+  - "requirements.txt"
+  - "requirements/**"
+  - "Pipfile"
+  - "Pipfile.lock"
+  - "pyproject.toml"
+  - "poetry.lock"
+  - "setup.py"
+  - "setup.cfg"
+  - "manage.py"
+  - "wsgi.py"
+  - "asgi.py"
+  - "**/settings.py"
+  - "**/settings/**"
+  - "**/manage.py"
+  - "**/wsgi.py"
+  - "**/asgi.py"
+  - "**/migrations/**"
+  - "**/auth/**"
+  - "**/authentication/**"
+  - "**/permissions.py"
+  - "**/permissions/**"
+  - "**/middleware.py"
+  - "**/middleware/**"
+  - "**/*middleware*"
+
+haltPatterns:
+  - "DROP TABLE"
+  - "TRUNCATE TABLE"
+  - "rm -rf"
+  - "chmod 777"
+  - "DEBUG = True"
+  - "DEBUG=True"
+  - "verify=False"
+  - "ALLOWED_HOSTS = []"

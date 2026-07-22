@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { defaultConfig, loadConfig } from "../src/config.js";
 import { authAndSecretsRule } from "../src/rules/auth-and-secrets.js";
+import { configuredHaltPatternsRule } from "../src/rules/configured-halt-patterns.js";
 import { dependencyChangesRule } from "../src/rules/dependency-changes.js";
 import { destructiveOpsRule } from "../src/rules/destructive-ops.js";
 import { githubActionsRule } from "../src/rules/github-actions.js";
@@ -96,6 +97,24 @@ describe("rule modules", () => {
         halt: true,
         files: ["migrations/20260626_drop_users.sql"],
         evidence: ["DROP TABLE users;"]
+      })
+    ]);
+  });
+
+  it("halts added lines that match configured halt patterns", () => {
+    const config = { ...defaultConfig, haltPatterns: ["DEBUG = True"] };
+    const findings = configuredHaltPatternsRule([
+      diffFile("project/settings.py", ["DEBUG = true"])
+    ], config);
+
+    expect(findings).toEqual([
+      expect.objectContaining({
+        ruleId: "configured-halt-pattern",
+        severity: "critical",
+        score: 100,
+        halt: true,
+        files: ["project/settings.py"],
+        evidence: ["DEBUG = True"]
       })
     ]);
   });
@@ -244,6 +263,38 @@ describe("rule modules", () => {
       expect.objectContaining({
         ruleId: "github-workflow-change",
         files: [".github/workflows/ci.yml"]
+      })
+    ]));
+  });
+
+  it("matches Python/Django policy pack protected auth, permissions, middleware, migrations, and settings files", () => {
+    const config = loadConfig(fileURLToPath(new URL("../policy-packs/python-django.yml", import.meta.url)));
+    const findings = sensitiveFilesRule([
+      diffFile("app/auth/backends.py"),
+      diffFile("app/permissions.py"),
+      diffFile("app/middleware.py"),
+      diffFile("app/migrations/0001_initial.py"),
+      diffFile("project/settings.py"),
+      diffFile("manage.py"),
+      diffFile("wsgi.py"),
+      diffFile("asgi.py"),
+      diffFile("requirements.txt")
+    ], config);
+
+    expect(findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: "protected-path-change",
+        files: [
+          "app/auth/backends.py",
+          "app/permissions.py",
+          "app/middleware.py",
+          "app/migrations/0001_initial.py",
+          "project/settings.py",
+          "manage.py",
+          "wsgi.py",
+          "asgi.py",
+          "requirements.txt"
+        ]
       })
     ]));
   });

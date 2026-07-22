@@ -1,0 +1,16 @@
+diff --git a/app/migrations/0007_drop_legacy_profile.py b/app/migrations/0007_drop_legacy_profile.py
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/app/migrations/0007_drop_legacy_profile.py
+@@ -0,0 +1,10 @@
++from django.db import migrations
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [("app", "0006_add_profile_bio")]
++
++    operations = [
++        migrations.RunSQL("DROP TABLE legacy_profile;"),
++    ]
