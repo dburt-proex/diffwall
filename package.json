@@ -11,7 +11,9 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "scan:demo": "tsx src/cli.ts scan --diff test/fixtures/auth-bypass.diff --format markdown",
-    "scan:staged": "tsx src/cli.ts scan --staged --format markdown"
+    "scan:staged": "tsx src/cli.ts scan --staged --format markdown",
+    "bench:large-diff": "tsx scripts/benchmark-large-diff.ts",
+    "release:verify": "node scripts/verify-release-readiness.mjs"
   },
   "keywords": ["ai", "agents", "github-actions", "code-review", "devsecops", "pull-requests", "security"],
   "engines": {
@@ -19,9 +21,9 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^24.0.0",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "@types/node": "24.0.0",
+    "tsx": "4.20.3",
+    "typescript": "5.8.3",
+    "vitest": "3.2.7"
   }
 }
