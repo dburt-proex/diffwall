@@ -1,114 +1,95 @@
 # DiffWall Status
 
-Last updated: 2026-07-11
+Last updated: 2026-07-23
 
 ## Current verdict
 
-DiffWall is **not just theory**. The repository contains working enforcement code for two surfaces:
+DiffWall is an **early working deterministic enforcement firewall** with two independent control surfaces:
 
-1. **PR Firewall** — TypeScript CLI and GitHub Action that scan unified diffs, apply deterministic rules, score risk, and route changes to `ALLOW`, `REVIEW`, or `HALT`.
-2. **Action Firewall** — Python stdlib-only validator that evaluates structured AI/agent action objects before execution.
+1. **PR Firewall** — TypeScript CLI and CI integrations that scan unified diffs, apply deterministic rules, score risk, and route changes to `ALLOW`, `REVIEW`, or `HALT`.
+2. **Action Firewall** — Python stdlib-only validator that evaluates structured AI or agent actions before execution.
 
-DiffWall is currently best described as an **early working deterministic enforcement firewall** with live-validated PR workflow integration, PR comment delivery, evidence artifacts, live `REVIEW` and `HALT` proof, and CI coverage for both engines.
+The repository includes live-controlled GitHub pull-request validation, PR comment delivery, evidence artifacts, merged SARIF output, CODEOWNERS-aware reviewer suggestions, GitLab CI guidance, Terraform and Python/Django policy packs, GitHub Actions workflow-risk fixtures, and a canonical buyer-facing pilot runbook.
 
-It should not yet be described as a fully hardened enterprise DevSecOps product. The next release gates are a pinned action tag, broader compatibility testing, and product-facing proof media.
+DiffWall is **not** a fully hardened enterprise DevSecOps product. Required production gates remain a pinned release, broader compatibility testing, supply-chain and operational security review, performance testing, and defined long-term evidence retention.
 
-Public proof:
+## Canonical evidence
 
-- [`docs/live-validation-case-study.md`](docs/live-validation-case-study.md) — controlled real-PR `REVIEW` and `HALT` evidence.
-- [`docs/use-cases.md`](docs/use-cases.md) — buyer problems, technical use cases, and initial commercial packages.
-- [`docs/github-action.md`](docs/github-action.md) — validated integration contract and inputs.
-
----
+- [`docs/ai-coding-governance-pilot.md`](docs/ai-coding-governance-pilot.md) — buyer-facing evaluation and validation contract.
+- [`docs/live-validation-case-study.md`](docs/live-validation-case-study.md) — controlled real-PR `REVIEW` and `HALT` proof.
+- [`docs/github-action.md`](docs/github-action.md) — validated GitHub Action contract.
+- [`docs/gitlab-ci.md`](docs/gitlab-ci.md) — GitLab merge-request execution pattern.
+- [`docs/use-cases.md`](docs/use-cases.md) — buyer problems and bounded commercial concepts.
 
 ## Capability matrix
 
-| Capability | Status | Notes |
+| Capability | Status | Evidence boundary |
 |---|---:|---|
-| TypeScript PR diff scanner | Working | Parses unified diffs and applies default rules. |
-| Deterministic ALLOW / REVIEW / HALT routing | Working | Score thresholds plus hard HALT findings. |
-| Local CLI scan | Working | Supports diff files, staged changes, and base/head refs. |
-| Markdown and JSON output | Working | Used by CI evidence and PR reporting. |
-| TypeScript unit/build CI | Proven | Build, tests, demo scan, and three-route evidence completed successfully. |
-| Python Action Firewall | Working | Validates structured action JSON and exits by verdict severity. |
-| Python unit/CLI CI | Proven | Tests, demo, exit-code checks, and three-route evidence completed successfully. |
-| Composite GitHub Action | Live validated | Loaded and executed through `uses: ./action` in real PR workflows. |
-| PR workflow | Live validated | Immutable base SHA, evidence upload, and route enforcement completed successfully. |
-| PR comment updater | Live validated | Created marked `REVIEW` and `HALT` reports on controlled proof PRs. |
-| Evidence artifacts | Working | PR reports, diagnostics, and engine route evidence upload through GitHub Actions. |
-| Live HALT PR enforcement | Proven | Published a 100/100 HALT report and then failed the workflow as designed. |
-| SARIF export | Not implemented | Roadmap item. |
-| CODEOWNERS-aware routing | Working | Maps triggered files to CODEOWNERS owners in Markdown/JSON reports. |
-| Policy packs | Not implemented | Roadmap item. |
-| Runtime middleware | Not implemented | Roadmap item. |
-| Demo screenshots/GIF | Missing | Needed for buyer-facing proof. |
+| TypeScript PR diff scanner | Working | Unified-diff parsing and deterministic rule evaluation on `main`. |
+| Deterministic `ALLOW` / `REVIEW` / `HALT` routing | Working | Threshold routing plus critical hard-HALT findings. |
+| Local CLI | Working | Saved diff, staged changes, and base/head refs. |
+| Markdown and JSON output | Working | Used by local and CI reporting. |
+| SARIF output | Working | Implemented in `src/output/sarif.ts` with regression coverage. |
+| TypeScript build and test CI | Proven | Existing build, test, demo, and route fixtures. |
+| Python Action Firewall | Working | Structured action validation with verdict exit codes. |
+| Python unit and CLI CI | Proven | Rule and CLI regression evidence. |
+| Composite GitHub Action | Live validated | Executed through controlled real pull requests. |
+| PR comment updater | Live validated | Marked `REVIEW` and `HALT` comments created or updated. |
+| Evidence-before-enforcement behavior | Proven | Controlled HALT report and evidence published before job failure. |
+| CODEOWNERS-aware routing | Working | Triggered files map to suggested reviewers. |
+| GitLab CI pattern | Documented and fixture-backed | CLI execution against merge-request refs. |
+| Node/Express policy pack | Working | Merged repository policy pack. |
+| Python/Django policy pack | Working | Merged through PR #23 with REVIEW and HALT fixtures. |
+| Terraform policy pack | Working | Merged through PR #22 with protected paths and destructive patterns. |
+| GitHub Actions workflow-risk detection | Working | Merged REVIEW and HALT fixtures, including unsafe `pull_request_target`. |
+| AI Coding Governance Pilot | Pilot-ready contract | Merged through PR #25; not yet externally buyer-validated. |
+| Runtime middleware integration | Not implemented | Future separately governed work. |
+| Long-lived audit export and retention | Not implemented | Future productization gate. |
+| Buyer-facing screenshots and demo media | Missing | Product proof backlog. |
+| Pinned action release | Missing | Required before production merge enforcement. |
 
----
+## Safe claim
 
-## What is safe to claim now
+> DiffWall is an early working PR and structured-action firewall. It scans diffs and structured actions, applies explainable deterministic risk rules, routes changes to `ALLOW`, `REVIEW`, or `HALT`, supports GitHub and GitLab-oriented CI patterns, and includes controlled live `REVIEW` and `HALT` proof.
 
-> DiffWall is an early working PR and agent-action firewall. It scans diffs and structured actions, applies explainable deterministic risk rules, routes changes to ALLOW, REVIEW, or HALT, and includes a live-validated GitHub Action with PR comments, evidence artifacts, and proven HALT enforcement.
+Do not claim full enterprise production readiness, certification, regulatory compliance, universal coverage, guaranteed risk prevention, or customer adoption without new evidence.
 
-Avoid claiming full enterprise production readiness until a pinned release, broader repository compatibility testing, security review, and operational hardening are complete.
+## Product and system independence
 
----
+DiffWall is independently deployable and does not require another repository or control plane at runtime.
+
+Operator Intelligence, CASA, VIL, PromptBP, and the Governance Harness Toolkit may support assessment, runtime governance, evidence, specifications, or workflow control, but they remain independent systems. CASA canonical repository ownership is unresolved and no DiffWall runtime dependency should be inferred.
 
 ## Hardening progress
 
-### Phase 1 — Truth alignment
+### Completed
 
-- [x] Add repo-level `STATUS.md`.
-- [x] Align README claims with implemented capability.
-- [x] Document what is working, experimental, and planned.
+- repository-level status and claim boundaries;
+- composite GitHub Action hardening;
+- real-PR `REVIEW` and `HALT` validation;
+- PR comment and evidence delivery;
+- CI coverage for PR and action engines;
+- deterministic route fixtures;
+- SARIF output;
+- CODEOWNERS-aware routing;
+- GitLab CI guidance;
+- Node/Express, Python/Django, and Terraform policy packs;
+- GitHub Actions workflow-risk fixtures;
+- canonical AI Coding Governance Pilot.
 
-### Phase 2 — GitHub Action hardening
+### Remaining
 
-- [x] Harden composite GitHub Action wrapper inputs.
-- [x] Fix strict action-manifest YAML parsing.
-- [x] Ensure report publishing runs before verdict enforcement.
-- [x] Publish the exact supported invocation path.
-- [x] Add repository PR workflow invoking the local action wrapper.
-- [x] Validate the action wrapper in a real PR workflow.
-- [x] Validate PR comment create/update behavior.
-- [x] Confirm live `HALT` blocks a PR job after report/comment publication.
+- pinned action release;
+- broader repository and monorepo compatibility testing;
+- supply-chain and operational security review;
+- large-diff and performance testing;
+- long-lived audit export and retention strategy;
+- buyer-facing screenshots or demo media;
+- external pilot validation;
+- separately governed runtime middleware work.
 
-### Phase 3 — CI proof
+## Near-term product lane
 
-- [x] Run TypeScript build, unit tests, and demo scan.
-- [x] Run Python Action Firewall unit tests and CLI exit-code checks.
-- [x] Add action self-test workflow for ALLOW / REVIEW / HALT fixtures.
-- [x] Generate and upload route evidence artifacts.
-- [x] Persist PR report and diagnostics artifacts.
+> AI Coding Governance Pilot for engineering teams using Codex, Claude Code, Cursor, Copilot, OpenCode, or other coding agents.
 
-### Phase 4 — Product proof
-
-- [ ] Add screenshots/GIF for ALLOW, REVIEW, and HALT flows.
-- [x] Add deterministic fixtures for all three routes.
-- [x] Add buyer-facing use cases.
-- [x] Add one polished public validation case study.
-
-### Phase 5 — Productization
-
-- [ ] Cut and document a pinned action release.
-- [ ] Add SARIF export.
-- [x] Add CODEOWNERS-aware routing.
-- [ ] Add policy packs.
-- [ ] Add runtime middleware.
-- [ ] Add audit log export.
-
----
-
-## Current strategic role
-
-DiffWall is the **developer-facing wedge** of the broader Operator Intelligence / CASA system:
-
-```txt
-VIL finds risk signals.
-CASA decides the route.
-DiffWall enforces the gate.
-Decision Ledger records proof.
-```
-
-The strongest near-term product lane is:
-
-> AI PR Firewall for teams using Codex, Claude Code, Cursor, Copilot, OpenCode, or other AI coding agents.
+The pilot evaluates whether repository-local policy can produce explainable `REVIEW` and `HALT` decisions with preserved evidence. A successful pilot is bounded evidence, not enterprise certification.

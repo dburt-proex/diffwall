@@ -2,93 +2,102 @@
 
 A deterministic enforcement firewall for AI-generated code and agent actions.
 
-DiffWall is the enforcement layer in the CASA Control Plane:
+DiffWall scans pull-request diffs and structured agent actions, applies transparent repository-local policy, and routes each change to `ALLOW`, `REVIEW`, or `HALT`.
 
-```txt
-VIL finds risk signals.
-CASA decides the route.
-DiffWall enforces the gate.
-```
+> **Current status:** early working enforcement system with live-validated GitHub pull-request integration, deterministic route evidence, policy packs, SARIF output, CODEOWNERS-aware reviewer suggestions, GitLab CI guidance, and a bounded buyer-facing pilot. DiffWall is not yet a fully hardened enterprise DevSecOps product.
 
-It protects two execution surfaces:
+## Product boundary
 
-1. **PR Firewall** — scans pull-request diffs before merge, scores risk, and routes each PR to `ALLOW`, `REVIEW`, or `HALT`.
-2. **Action Firewall** — validates proposed AI/agent actions before execution and blocks destructive, financial, or secret-leaking actions.
+DiffWall is an independent developer-control system. It can operate by itself in a repository and does not require CASA, VIL, Operator Intelligence, PromptBP, or the Governance Harness Toolkit at runtime.
 
-DiffWall is not an LLM reviewer. The core design goal is deterministic, transparent, repo-local enforcement.
+Those systems may be used independently around DiffWall:
 
-> **Current status:** early working enforcement system. The TypeScript PR scanner, Python Action Firewall, composite GitHub Action, PR comment updater, and CI evidence paths are implemented and have been exercised in a real pull request. It is not yet positioned as a fully hardened enterprise DevSecOps product. See [`STATUS.md`](STATUS.md).
+- **Operator Intelligence** may assess and prioritize governance gaps.
+- **DiffWall** enforces change-time and structured-action boundaries.
+- **CASA** is a separate runtime-governance architecture with unresolved canonical repository ownership.
+- **VIL**, **PromptBP**, and the **Governance Harness Toolkit** are optional independent supporting systems.
 
-```txt
-External signal / PR diff / agent intent
-        ↓
-VIL: signal evaluation and prioritization
-        ↓
-CASA: governance policy and route decision
-        ↓
-DiffWall: enforcement firewall
-        ↓
-ALLOW / REVIEW / HALT + audit trace
-```
+No cross-repository runtime dependency is implied.
 
-## Why DiffWall exists
+## Enforcement surfaces
 
-AI coding agents and workflow agents can move faster than human review. Traditional CI tells you whether tests passed. AI PR reviewers comment on possible issues. DiffWall decides what level of trust an action deserves before it is allowed to proceed.
+1. **PR Firewall** — scans pull-request or merge-request diffs, explains triggered rules, scores risk, and routes changes to `ALLOW`, `REVIEW`, or `HALT`.
+2. **Action Firewall** — validates structured AI or agent actions before execution and blocks destructive, financial, public-broadcast, mutation, or secret-exposure risks.
 
-The failure mode is simple: an agent proposes a risky diff, a destructive migration, a credential-bearing config write, a production deletion, a payment action, or an external broadcast — and nothing sits between intent and execution.
+DiffWall is not an LLM reviewer. Its core design goal is deterministic, inspectable, repository-local enforcement.
 
-DiffWall is that boundary.
+## Canonical evaluation path
+
+The buyer-facing evaluation contract is:
+
+- [`docs/ai-coding-governance-pilot.md`](docs/ai-coding-governance-pilot.md)
+
+The pilot defines inventory, policy selection, controlled fixtures, evidence review, and recommendation handoff. It requires controlled `REVIEW` and `HALT` proof and preserves explicit maturity boundaries.
+
+Live real-PR validation is documented in:
+
+- [`docs/live-validation-case-study.md`](docs/live-validation-case-study.md)
 
 ## Routing model
 
 | Route | Meaning |
 |---|---|
-| `ALLOW` | Low-risk / read-only / acceptable under current policy |
-| `REVIEW` | Human review required before execution or merge |
-| `HALT` | Unsafe, irreversible, financial, secret-leaking, or policy-violating |
+| `ALLOW` | Low-risk, read-only, or acceptable under current policy |
+| `REVIEW` | Human review is required before execution or merge |
+| `HALT` | Unsafe, irreversible, financial, secret-leaking, destructive, or policy-violating |
 
-Critical findings force `HALT`. Unknown agent actions fail safe to `REVIEW`, never silent allow.
+Critical findings force `HALT`. Unknown structured actions fail safe to `REVIEW`, never silent allow.
+
+## Current merged capability
+
+### PR Firewall
+
+- TypeScript unified-diff scanner
+- deterministic `ALLOW` / `REVIEW` / `HALT` routing
+- Markdown, JSON, and SARIF output
+- composite GitHub Action
+- PR comment create/update behavior
+- evidence-before-enforcement ordering
+- CODEOWNERS-aware reviewer suggestions
+- GitLab merge-request CI pattern
+- default and framework-specific policy packs
+- controlled route fixtures and CI evidence
+
+### Merged policy packs
+
+- [`policy-packs/node-express.yml`](policy-packs/node-express.yml)
+- [`policy-packs/python-django.yml`](policy-packs/python-django.yml)
+- [`policy-packs/terraform.yml`](policy-packs/terraform.yml)
+
+GitHub Actions workflow-risk behavior is covered by merged fixtures and tests, including safe review and unsafe `pull_request_target` patterns.
+
+### Action Firewall
+
+The Python Action Firewall validates structured action objects and returns an audit-ready route for:
+
+- read-only actions;
+- state mutations;
+- external communication;
+- public broadcast;
+- irreversible destruction;
+- financial transfer;
+- exposed secrets.
 
 ## Repository layout
 
-```txt
-src/                         # Current TypeScript PR Firewall implementation
-rules/                       # PR Firewall policy config
-demo/                        # PR Firewall diff fixtures / demos
-test/                        # PR Firewall tests
+```text
+src/                         # TypeScript PR Firewall
+rules/                       # Default repository policy
+policy-packs/                # Merged framework and infrastructure policy packs
+demo/                        # Controlled diffs and demonstrations
+test/                        # PR Firewall tests and regression fixtures
 action/                      # Composite GitHub Action wrapper
-packages/action-firewall/    # Python CASA agent-action validator
-docs/                        # CASA / VIL / DiffWall architecture docs
+packages/action-firewall/    # Python structured-action validator
+docs/                        # Integration, validation, pilot, and architecture records
+examples/                    # CI integration examples
 ```
 
-Future package migration target:
-
-```txt
-packages/pr-firewall/        # TypeScript GitHub PR diff firewall
-packages/action-firewall/    # Python CASA agent-action firewall
-```
-
-## PR Firewall
-
-The PR Firewall scans code diffs before merge, scores risk, explains what changed, and routes every PR:
-
-```txt
-GitHub PR
-   ↓
-Diff parser
-   ↓
-Risk detectors
-   ↓
-Policy engine
-   ↓
-ALLOW / REVIEW / HALT
-   ↓
-Markdown / JSON output + CI route
-```
-
-Built for teams using Codex, Claude Code, Cursor, Copilot, OpenCode, and other coding agents.
-
-### GitHub Action quickstart
+## GitHub Action quickstart
 
 ```yaml
 name: DiffWall
@@ -124,13 +133,18 @@ jobs:
           github_token: ${{ github.token }}
 ```
 
-This invocation has been validated in a real pull-request workflow. Pin a release tag rather than `main` before making DiffWall a required production merge gate.
+This invocation has been exercised in controlled real pull requests. **Pin a release tag rather than `main` before making DiffWall a required production merge gate.**
 
-### GitLab CI quickstart
+See [`docs/github-action.md`](docs/github-action.md) for the integration contract.
 
-DiffWall also runs outside GitHub Actions. See [`examples/gitlab-ci.yml`](examples/gitlab-ci.yml) and [`docs/gitlab-ci.md`](docs/gitlab-ci.md) for a merge-request pipeline job that scans `CI_MERGE_REQUEST_DIFF_BASE_SHA` → `CI_COMMIT_SHA` and fails the job only when the route is `HALT`.
+## GitLab CI
 
-### Local development
+DiffWall can run as a plain Node CLI in GitLab merge-request pipelines. See:
+
+- [`examples/gitlab-ci.yml`](examples/gitlab-ci.yml)
+- [`docs/gitlab-ci.md`](docs/gitlab-ci.md)
+
+## Local development
 
 ```bash
 npm install
@@ -139,43 +153,15 @@ npm test
 npm run scan:demo
 ```
 
-### Local CLI usage
+Local CLI examples:
 
 ```bash
-# Scan a fixture or saved unified diff
 npx tsx src/cli.ts scan --diff test/fixtures/auth-bypass.diff --format markdown
-
-# Scan staged local changes
 npx tsx src/cli.ts scan --staged --format markdown
-
-# Scan two refs
-npx tsx src/cli.ts scan --base origin/main --head HEAD --format json --fail-on-halt
+npx tsx src/cli.ts scan --base origin/main --head HEAD --format sarif --fail-on-halt
 ```
 
-### Default PR risk signals
-
-- Sensitive files changed
-- GitHub workflow changed
-- Auth, session, JWT, OAuth, permissions, security, or billing code changed
-- Dependency manifest or lockfile changed
-- Secret-like string added
-- Destructive SQL migration
-- Dangerous shell command
-- TLS verification disabled
-- Remote script piped into shell
-- Dynamic execution or unsafe deserialization
-- New network egress near environment access
-- Large generated diff
-- Source changed without test changes
-- Test removal
-
-### CODEOWNERS-aware routing
-
-If a `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS` file exists in the repository, DiffWall maps every file that triggered a finding to its CODEOWNERS owners and adds a suggested-reviewer list to the Markdown and JSON reports. It follows standard CODEOWNERS/gitignore pattern semantics (last matching pattern wins) and is a no-op when no CODEOWNERS file is present.
-
-## Action Firewall
-
-The Action Firewall is the Python CASA proof: a stdlib-only validator that intercepts proposed AI/agent actions and returns an audit-ready decision.
+Action Firewall checks:
 
 ```bash
 cd packages/action-firewall
@@ -185,41 +171,50 @@ python -m diffwall.cli validate examples/actions/allow_read_file.json
 python -m diffwall.cli validate examples/actions/halt_delete_prod_db.json
 ```
 
-CLI exit codes:
+## Default PR risk signals
 
-| Exit | Verdict |
-|---:|---|
-| 0 | `ALLOW` |
-| 1 | `REVIEW` |
-| 2 | `HALT` |
+- protected and sensitive files;
+- GitHub workflow changes;
+- authentication, authorization, permissions, security, billing, and deployment changes;
+- dependency manifests and install scripts;
+- secret-like additions;
+- destructive SQL and shell operations;
+- unsafe GitHub Actions patterns;
+- TLS verification disablement;
+- remote scripts piped into shells;
+- dynamic execution and unsafe deserialization;
+- network egress near environment access;
+- large generated diffs;
+- source changes without tests;
+- test removal.
 
-The Action Firewall currently includes rules for irreversible destruction, financial transfer, exposed secrets, public broadcast, data mutation, and read-only actions.
+## Evidence and claim boundary
 
-## CASA Control Plane mapping
+Safe current claim:
 
-| Layer | Responsibility | Artifact |
-|---|---|---|
-| VIL | Find and score meaningful risk/opportunity signals | Verified Intelligence Layer |
-| CASA | Define policy routes and governance gates | Control Awareness System Architecture |
-| DiffWall | Enforce gates before merge or execution | PR Firewall + Action Firewall |
+> DiffWall is an early working PR and structured-action firewall. It applies explainable deterministic rules, routes changes to `ALLOW`, `REVIEW`, or `HALT`, supports repository-local CI integration, and includes live-controlled `REVIEW` and `HALT` evidence.
 
-## Why not just CodeQL, Semgrep, CI, or an AI PR reviewer?
+Do not claim:
 
-| Tool type | What it does | Gap |
-|---|---|---|
-| Code scanners | Find known vulnerability patterns | Do not route agent-generated diffs by merge risk |
-| AI PR reviewers | Comment on possible issues | Often do not enforce policy |
-| CI | Runs tests and builds | Does not judge blast radius or trust boundary changes |
-| DiffWall | Scores risk and enforces route decisions | Designed for AI-agent coding and execution workflows |
+- full enterprise production readiness;
+- certification or regulatory compliance;
+- universal repository or language coverage;
+- zero false positives or false negatives;
+- guaranteed prevention of unsafe AI-generated code;
+- unattended production autonomy;
+- customer adoption not supported by evidence.
 
-## Roadmap
+## Remaining release gates
 
-- Publish a pinned action release after HALT-path validation
-- Add SARIF export
-- Add policy packs for Node, Python, Rails, Django, Terraform, and GitHub Actions
-- Add runtime agent middleware for action validation
-- Add audit log export
-- Add buyer-facing screenshots and ALLOW / REVIEW / HALT demo media
+- cut and document a pinned action release;
+- broaden compatibility testing across representative repositories and monorepos;
+- complete supply-chain and operational security review;
+- test large-diff and performance behavior;
+- define long-lived audit retention and export;
+- add buyer-facing screenshots or demo media;
+- validate the pilot with an external repository or buyer.
+
+See [`STATUS.md`](STATUS.md), [`ROADMAP.md`](ROADMAP.md), and [`CHANGELOG.md`](CHANGELOG.md) for the current maturity record.
 
 ## License
 
