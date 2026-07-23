@@ -53,6 +53,7 @@ function main() {
     if (options.failOnHalt && result.route === "HALT")
         process.exit(2);
 }
+/** Report an operational error and exit non-zero (distinct from HALT=2). */
 function fail(error) {
     const message = error instanceof Error ? error.message : String(error);
     process.stderr.write(`DiffWall error: ${message}\n`);
