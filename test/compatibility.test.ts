@@ -28,7 +28,7 @@ function fileDiff(path: string, addedLine: string, lineEnding = "\n"): string {
 }
 
 describe("repository compatibility", () => {
-  it("applies repository-local policy to nested monorepo auth and package paths", () => {
+  it("applies strict repository-local policy to combined monorepo auth and package changes", () => {
     const diff = [
       fileDiff("apps/api/src/auth/session.ts", "export const rotateSession = true;"),
       fileDiff("packages/web/package.json", '  "dependency": "1.0.0"')
@@ -45,7 +45,7 @@ describe("repository compatibility", () => {
         "packages/web/package.json"
       ])
     );
-    expect(result.route).toBe("REVIEW");
+    expect(result.route).toBe("HALT");
   });
 
   it("parses CRLF diffs from Windows-oriented repositories without failing open", () => {
