@@ -1,0 +1,110 @@
+name: Release readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-readiness-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-readiness:
+    name: Node ${{ matrix.node }} release evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install exact direct dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit and compatibility tests
+        run: npm test
+
+      - name: Large-diff benchmark
+        run: |
+          mkdir -p artifacts/release-readiness
+          npm run bench:large-diff | tee artifacts/release-readiness/large-diff-node-${{ matrix.node }}.json
+
+      - name: Verify release candidate structure
+        run: |
+          npm run release:verify | tee artifacts/release-readiness/release-verify-node-${{ matrix.node }}.json
+
+      - name: Record dependency tree
+        run: npm ls --all --json > artifacts/release-readiness/npm-tree-node-${{ matrix.node }}.json
+
+      - name: High-severity dependency audit
+        run: npm audit --audit-level=high --json > artifacts/release-readiness/npm-audit-node-${{ matrix.node }}.json
+
+      - name: Record package inventory
+        run: npm pack --dry-run --json > artifacts/release-readiness/npm-pack-node-${{ matrix.node }}.json
+
+      - name: Build local action candidate archive
+        if: matrix.node == 20
+        run: |
+          tar -czf artifacts/release-readiness/diffwall-action-candidate.tgz \
+            action dist rules policy-packs package.json package-lock.json LICENSE
+          sha256sum artifacts/release-readiness/diffwall-action-candidate.tgz \
+            > artifacts/release-readiness/diffwall-action-candidate.sha256
+
+      - name: Upload release-readiness evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: diffwall-release-readiness-node-${{ matrix.node }}
+          path: |
+            artifacts/release-readiness
+            package-lock.json
+          if-no-files-found: error
+          retention-days: 30
+
+  python-compatibility:
+    name: Python ${{ matrix.python }} action-firewall evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+
+    defaults:
+      run:
+        working-directory: packages/action-firewall
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Run Action Firewall tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Verify governed CLI routes
+        run: |
+          python -m diffwall.cli validate examples/actions/allow_read_file.json --json > /tmp/allow.json
+          grep -q '"verdict": "ALLOW"' /tmp/allow.json
+
+          set +e
+          python -m diffwall.cli validate examples/actions/halt_delete_prod_db.json --json > /tmp/halt.json
+          halt_status=$?
+          set -e
+
+          test "$halt_status" -eq 2
+          grep -q '"verdict": "HALT"' /tmp/halt.json
