@@ -33,6 +33,11 @@ export async function updatePullRequestComment() {
     });
     process.stdout.write(`Created DiffWall PR comment #${created.id}\n`);
 }
+/**
+ * Fetch every page of PR comments. Without following pagination a busy PR
+ * (>30 comments) would hide the existing DiffWall comment and cause a new
+ * duplicate to be posted on each run.
+ */
 async function listAllComments(commentsUrl, token) {
     const all = [];
     const separator = commentsUrl.includes("?") ? "&" : "?";
@@ -44,6 +49,7 @@ async function listAllComments(commentsUrl, token) {
     }
     return all;
 }
+/** Extract the `rel="next"` URL from a GitHub Link header, if present. */
 function nextPageUrl(linkHeader) {
     if (!linkHeader)
         return undefined;
