@@ -6,6 +6,7 @@ import type { DiffWallConfig } from "../src/types.js";
 
 const monorepoConfig: DiffWallConfig = {
   ...defaultConfig,
+  thresholds: { review: 20, halt: defaultConfig.thresholds.halt },
   ignorePaths: ["docs/**", "**/*.md"],
   protectedPaths: [
     ...defaultConfig.protectedPaths,
@@ -44,7 +45,7 @@ describe("repository compatibility", () => {
         "packages/web/package.json"
       ])
     );
-    expect(result.route).not.toBe("ALLOW");
+    expect(result.route).toBe("REVIEW");
   });
 
   it("parses CRLF diffs from Windows-oriented repositories without failing open", () => {
@@ -62,7 +63,7 @@ describe("repository compatibility", () => {
     expect(
       result.findings.some((finding) => finding.ruleId === "protected-path-change")
     ).toBe(true);
-    expect(result.route).not.toBe("ALLOW");
+    expect(result.route).toBe("REVIEW");
   });
 
   it("keeps nested documentation ignored when repository policy excludes it", () => {
