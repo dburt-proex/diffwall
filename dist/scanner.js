@@ -12,6 +12,8 @@ export function scanDiff(diff, config, codeowners = []) {
     const parsed = parseUnifiedDiff(diff);
     const files = parsed.filter((file) => !matchesAny(file.path, config.ignorePaths));
     const findings = defaultRules.flatMap((rule) => rule(files, config));
+    // Fail safe: content that looks like a diff but parsed into zero files must
+    // not be waved through as ALLOW. Surface it and force at least REVIEW.
     if (parsed.length === 0 && looksLikeDiff(diff)) {
         const failSafe = {
             ruleId: "unparseable-diff",
@@ -22,6 +24,9 @@ export function scanDiff(diff, config, codeowners = []) {
         findings.push(failSafe);
     }
     const result = scoreFindings(files, findings, config);
+    // Route the findings' triggered files through CODEOWNERS to suggest who
+    // should review a REVIEW/HALT change. Absent a CODEOWNERS file this is a
+    // no-op and yields empty owner data.
     const triggeredFiles = [...new Set(findings.flatMap((finding) => finding.files ?? []))];
     const matches = matchOwners(triggeredFiles, codeowners);
     result.owners = { matches, suggestedReviewers: suggestedReviewers(matches) };
