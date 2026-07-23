@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateConfig, globToRegExp, matchesAny } from "../src/config.js";
+import { globToRegExp, loadConfig, matchesAny, validateConfig } from "../src/config.js";
 import type { DiffWallConfig } from "../src/types.js";
 
 function config(review: number, halt: number): DiffWallConfig {
@@ -39,5 +39,14 @@ describe("globToRegExp / matchesAny", () => {
   it("matchesAny returns true when any pattern matches", () => {
     expect(matchesAny("src/auth/session.ts", ["src/auth/**", "docs/**"])).toBe(true);
     expect(matchesAny("src/util.ts", ["src/auth/**"])).toBe(false);
+  });
+
+  it("keeps source scanned while excluding compiler-verified dist in self-scan", () => {
+    const selfScan = loadConfig("rules/self-scan.yml");
+
+    expect(matchesAny("dist/config.js", selfScan.ignorePaths)).toBe(true);
+    expect(matchesAny("src/config.ts", selfScan.ignorePaths)).toBe(false);
+    expect(matchesAny(".github/workflows/release-readiness.yml", selfScan.ignorePaths)).toBe(false);
+    expect(matchesAny("package.json", selfScan.ignorePaths)).toBe(false);
   });
 });
