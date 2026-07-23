@@ -20,7 +20,7 @@ This review evaluates the security of distributing and operating DiffWall. It do
 1. The caller repository is untrusted input.
 2. Diff content, file paths, PR metadata, CODEOWNERS content, and action objects are untrusted input.
 3. The GitHub token is optional and must remain least privilege.
-4. Dependency registries and third-party GitHub Actions are supply-chain dependencies.
+4. Dependency registries and third-party GitHub Actions are build-time supply-chain dependencies.
 5. Uploaded workflow artifacts are evidence, not trusted executable input.
 6. A release tag is an immutable authority boundary and must not move after publication.
 
@@ -28,8 +28,8 @@ This review evaluates the security of distributing and operating DiffWall. It do
 
 | ID | Finding | Severity | Control or required disposition |
 |---|---|---:|---|
-| SEC-001 | JavaScript tooling dependencies could drift when ranges are used | High | Direct development dependencies are pinned to exact versions; a committed lockfile is required before publication. |
-| SEC-002 | The composite action installs and builds tooling at execution time | High | The release candidate must use `npm ci` against the committed lockfile. No production tag may be approved while the action falls back to an unlocked install. |
+| SEC-001 | JavaScript tooling dependencies could drift when ranges are used | High | Direct development dependencies are pinned to exact versions; dependency tree and audit evidence are captured on the canonical Node release job. |
+| SEC-002 | Installing and compiling tooling inside every caller repository expands the runtime supply chain | High | The composite action now runs a committed `dist/` runtime bundle and performs no npm install or TypeScript build in the caller workspace. CI rebuilds source and proves the committed runtime matches. |
 | SEC-003 | Untrusted diff content may contain commands, secrets, or prompt-injection text | High | DiffWall parses input as data, does not execute changed code, redacts secret-like evidence, and runs with read-only contents permission by default. |
 | SEC-004 | PR comment delivery requires write permission | Medium | `pull-requests: write` is optional and scoped to comment delivery. Report artifacts and step summaries remain valid when the token is absent or denied. |
 | SEC-005 | A malformed diff could fail open | High | Existing scanner fail-safe behavior routes diff-like unparseable content to at least `REVIEW`. |
@@ -42,11 +42,12 @@ This review evaluates the security of distributing and operating DiffWall. It do
 ## Supply-chain controls
 
 - no direct runtime npm dependencies;
-- exact direct development dependency versions;
-- committed npm lockfile required for a release candidate;
-- `npm ci` required for candidate and action execution once the lockfile is present;
+- committed JavaScript runtime bundle used by the composite action;
+- no npm installation or compilation in the caller repository;
+- exact direct development dependency versions for source validation;
+- source build compared against committed runtime in CI;
 - dependency-tree evidence captured in CI;
-- high-severity npm audit check captured in CI;
+- high-severity npm audit check captured on the canonical Node 20 release job;
 - candidate archive and SHA-256 checksum captured as evidence;
 - read-only workflow permissions;
 - no automatic tag, release, npm publish, or deployment behavior;
@@ -66,11 +67,11 @@ This review evaluates the security of distributing and operating DiffWall. It do
 
 ## Required pre-release checks
 
-- [ ] Committed lockfile matches `package.json`.
-- [ ] Composite action uses `npm ci` against the lockfile.
+- [ ] Committed runtime bundle matches a clean TypeScript build.
+- [ ] Composite action completes controlled routes without dependency installation.
 - [ ] TypeScript build and tests pass on Node 20 and 22.
 - [ ] Python Action Firewall tests pass on Python 3.11 and 3.12.
-- [ ] High-severity dependency audit passes or receives a documented `REVIEW` disposition.
+- [ ] High-severity dependency audit passes on the canonical release toolchain.
 - [ ] Large-diff benchmark passes and produces evidence.
 - [ ] Candidate archive checksum is recorded.
 - [ ] PR comment and report artifacts contain no live secrets or customer data.
