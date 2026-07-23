@@ -35,11 +35,14 @@ jobs:
         run: npm run build
 
       - name: Unit and compatibility tests
-        run: npm test
+        id: unit_tests
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts/release-readiness
+          npm test -- --reporter=verbose 2>&1 | tee artifacts/release-readiness/tests-node-${{ matrix.node }}.log
 
       - name: Large-diff benchmark
         run: |
-          mkdir -p artifacts/release-readiness
           npm run bench:large-diff | tee artifacts/release-readiness/large-diff-node-${{ matrix.node }}.json
 
       - name: Verify release candidate structure
@@ -64,6 +67,7 @@ jobs:
             > artifacts/release-readiness/diffwall-action-candidate.sha256
 
       - name: Upload release-readiness evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: diffwall-release-readiness-node-${{ matrix.node }}
@@ -72,6 +76,10 @@ jobs:
             package-lock.json
           if-no-files-found: error
           retention-days: 30
+
+      - name: Enforce unit-test result
+        if: always()
+        run: test "${{ steps.unit_tests.outcome }}" = "success"
 
   python-compatibility:
     name: Python ${{ matrix.python }} action-firewall evidence
