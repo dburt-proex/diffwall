@@ -57,12 +57,17 @@ export function parseUnifiedDiff(diff) {
             startFile(path, oldPath);
             continue;
         }
+        // A real file header is the adjacent marker pair `--- old` then `+++ new`.
+        // Requiring adjacency disambiguates it from added/removed content lines
+        // that merely begin with `---`/`+++` (e.g. a SQL `-- comment` or a source
+        // line starting with `+ `), which a firewall must not misparse away.
         if (line.startsWith("--- ") && lines[index + 1]?.startsWith("+++ ")) {
             const oldPath = normalizeMarkerPath(line.slice("--- ".length));
             const newPath = normalizeMarkerPath(lines[index + 1].slice("+++ ".length));
             const resolvedOld = oldPath === "/dev/null" ? undefined : oldPath;
             const resolvedNew = newPath === "/dev/null" ? undefined : newPath;
             if (current && !currentHasHeader) {
+                // git-header case: enrich the file already opened by `diff --git`.
                 if (resolvedOld)
                     current.oldPath = resolvedOld;
                 if (resolvedNew)
@@ -70,6 +75,7 @@ export function parseUnifiedDiff(diff) {
                 currentHasHeader = true;
             }
             else {
+                // header-less diff (diff -u / svn / saved patch): the pair opens a file.
                 startFile(resolvedNew ?? resolvedOld ?? "unknown", resolvedOld);
                 currentHasHeader = true;
             }
@@ -77,7 +83,7 @@ export function parseUnifiedDiff(diff) {
                 current.isNew = true;
             if (newPath === "/dev/null")
                 current.isDeleted = true;
-            index += 1;
+            index += 1; // consume the `+++` line
             continue;
         }
         if (!current)
