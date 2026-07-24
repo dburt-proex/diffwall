@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+No unreleased changes recorded.
+
+## v0.2.0 — 2026-07-24
+
+Release-candidate line for DiffWall's pilot-ready, independently deployable GitHub Action.
+
 ### Added
 
 - AI Coding Governance Pilot runbook as the canonical buyer-facing evaluation and validation contract.
@@ -12,6 +18,11 @@
 - CODEOWNERS-aware reviewer suggestions in Markdown and JSON reports.
 - GitLab merge-request CI guidance and example.
 - PR comment updater with a step-summary fallback when comment delivery is unavailable.
+- Committed `dist/**` runtime for action execution without installing dependencies in the caller repository.
+- Node 20/22 and Python 3.11/3.12 release-readiness matrix.
+- Nested monorepo, CRLF, strict-route, ignored-documentation, and self-scan regression coverage.
+- Synthetic large-diff benchmark, package inventory, dependency-tree audit, candidate archive, and checksum evidence.
+- Security review, audit-retention and export contract, buyer-validation protocol, demo media, and architecture-history records.
 
 ### Changed
 
@@ -20,16 +31,16 @@
 - Preserved CASA, Operator Intelligence, VIL, PromptBP, and Governance Harness Toolkit as optional independent systems.
 - Moved completed SARIF, CODEOWNERS, GitLab, policy-pack, and GitHub Actions detector work out of future-roadmap language.
 - Clarified the distinction between working capability, live-controlled proof, pilot-ready capability, and future production hardening.
-- Retained the requirement to pin a release tag before using DiffWall as a required production merge gate.
+- Pinned direct development dependency versions and upgraded Vitest to `3.2.7` for the audited candidate graph.
+- Hardened the action entrypoint to fail closed when committed runtime files are absent.
 
 ### Current maturity limits
 
-- No pinned production action release yet.
-- Broader repository and monorepo compatibility testing remains incomplete.
-- Supply-chain, operational security, and large-diff performance review remain incomplete.
-- Long-lived audit retention and export remain undefined.
-- Buyer-facing demo media and external pilot validation remain incomplete.
-- No claim of enterprise readiness, certification, regulatory compliance, universal coverage, or guaranteed risk prevention.
+- This entry defines a release candidate; no immutable `v0.2.0` tag or GitHub Release is created by this change.
+- External buyer validation remains incomplete.
+- The performance fixture is synthetic and does not establish universal repository performance.
+- Audit retention and export are specified; a dedicated runtime envelope exporter remains future work.
+- No claim of enterprise readiness, certification, regulatory compliance, universal coverage, customer adoption, or guaranteed risk prevention.
 
 ## v0.1.0
 
