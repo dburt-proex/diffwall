@@ -4,14 +4,16 @@
 #   - detector definitions (src/rules/**, diffwall/rules.py) embed keywords like
 #     "child_process", secret regexes, and SQL verbs;
 #   - the policy files (rules/**) list halt patterns such as "DROP TABLE";
-#   - the test/demo/example fixtures carry deliberate attack strings.
+#   - the test/demo/example fixtures carry deliberate attack strings;
+#   - the committed dist/** bundle is compiler output from those same definitions.
 #
 # Scanning those paths against the content rules would always HALT, so this
 # repo-local config ignores them while STILL enforcing the full policy on the
-# real application logic (src/cli.ts, config.ts, git.ts, scanner.ts, output/**,
-# github-comment.ts, and the Python engine/models/cli/report). Thresholds,
-# protected paths, and halt patterns are identical to rules/default.yml — the
-# shipped default stays strict for every other consumer.
+# real TypeScript source, workflow files, package manifests, action wrapper, and
+# Python engine/models/cli/report. The release-readiness workflow independently
+# rebuilds source and fails when committed dist/** differs from compiler output.
+# Thresholds, protected paths, and halt patterns are identical to
+# rules/default.yml — the shipped default stays strict for every other consumer.
 thresholds:
   review: 40
   halt: 75
@@ -22,6 +24,7 @@ ignorePaths:
   - "rules/**"
   - "policy-packs/**"
   - "src/rules/**"
+  - "dist/**"
   - "test/**"
   - "demo/**"
   - "packages/action-firewall/diffwall/rules.py"

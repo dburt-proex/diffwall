@@ -1,58 +1,81 @@
 # DiffWall Architecture
 
-DiffWall is the enforcement layer inside the CASA Control Plane.
+> **Authority note:** DiffWall is independently deployable. Earlier CASA and VIL control-plane language is preserved below as historical ecosystem context, not as a runtime dependency. See [`architecture-history.md`](architecture-history.md).
 
-```txt
-Signal / diff / proposed action
+## Current system boundary
+
+DiffWall is a deterministic enforcement system with two current surfaces:
+
+1. **PR Firewall** — evaluates repository diffs before merge.
+2. **Action Firewall** — evaluates structured agent actions before execution.
+
+Both surfaces produce inspectable `ALLOW`, `REVIEW`, or `HALT` decisions.
+
+```text
+Repository diff or structured action
         ↓
-VIL: Verified Intelligence Layer
+DiffWall parser and deterministic rules
         ↓
-CASA: Control Awareness System Architecture
+Score, findings, ownership suggestions, and evidence
         ↓
-DiffWall: enforcement firewall
-        ↓
-ALLOW / REVIEW / HALT + audit trail
+ALLOW / REVIEW / HALT
 ```
 
-## Layer responsibilities
+DiffWall can run without another repository, hosted service, model API, or control plane.
 
-| Layer | Role | Primary question |
+## Component responsibilities
+
+| Component | Responsibility | Must not |
 |---|---|---|
-| VIL | Intelligence and signal scoring | Is this signal meaningful enough to act on? |
-| CASA | Governance policy and routing | What should be allowed, reviewed, or halted? |
-| DiffWall | Enforcement boundary | Can this action or diff proceed right now? |
-
-## Enforcement surfaces
-
-DiffWall has two enforcement surfaces:
-
-1. **PR Firewall** — evaluates code diffs before merge.
-2. **Action Firewall** — evaluates proposed agent actions before execution.
-
-Both surfaces converge on the same governance route model: `ALLOW`, `REVIEW`, `HALT`.
+| Diff parser | Normalize unified diff content into file-level change records | Execute changed code |
+| Policy loader | Load repository-local thresholds, protected paths, and halt patterns | Expand authority outside the selected policy |
+| Rule engine | Produce deterministic findings and redacted evidence | Treat untrusted content as instructions |
+| Scoring and router | Select `ALLOW`, `REVIEW`, or `HALT` | Override critical halt findings |
+| CODEOWNERS resolver | Suggest relevant reviewers | Grant approval authority |
+| Output adapters | Produce Markdown, JSON, or SARIF | Change the route |
+| Composite action | Run the scanner and preserve evidence before enforcement | Publish a release or deploy systems |
+| Action Firewall | Validate structured actions using deterministic Python rules | Execute the proposed action |
 
 ## Design principles
 
 1. **Deterministic before clever.** The enforcement path must be repeatable, explainable, and testable.
-2. **Fail safe.** Unknown actions do not become allowed actions by default.
-3. **Most restrictive wins.** Layered risk escalates to the strictest matched verdict.
-4. **Audit trace is product surface.** Every decision should explain which policy fired and why.
-5. **Adapters are replaceable.** PR diffs, agent actions, deploy requests, and workflow automations are different inputs to the same control philosophy.
+2. **Fail safe.** Diff-like input that cannot be parsed does not silently become `ALLOW`.
+3. **Most restrictive wins.** Critical findings override aggregate scoring.
+4. **Evidence before enforcement.** Reports and comments are produced before a controlled `HALT` failure.
+5. **Repository-local policy.** Teams can inspect and version the rules governing their repository.
+6. **Least privilege.** Read-only repository access is the default; PR comment permission is optional.
+7. **Independent deployment.** No external project is required at runtime.
+8. **Honest maturity.** Working, live-validated, pilot-ready, and production-hardened states remain distinct.
 
 ## Current implementation map
 
-```txt
-packages/pr-firewall
-  TypeScript implementation for GitHub PR diff risk routing.
-
-packages/action-firewall
-  Python stdlib-only CASA validator for proposed AI/agent actions.
+```text
+src/                         TypeScript PR Firewall
+rules/                       Default policy
+policy-packs/                Node/Express, Python/Django, and Terraform policies
+ action/                     Composite GitHub Action
+packages/action-firewall/    Python structured-action validator
+test/                        Unit, routing, compatibility, and fixture regressions
+docs/                        Integration, validation, pilot, security, and release records
 ```
 
-## Strategic positioning
+## Optional ecosystem context
 
-DiffWall should not be framed as only a code-review tool or only a Python toy validator. It is the enforcement firewall for governed AI execution.
+DiffWall may participate in a broader governed-execution platform:
 
-The commercial wedge is the PR Firewall because it fits existing DevSecOps and GitHub workflows.
+```text
+Operator Intelligence  → assess and prioritize governance gaps
+DiffWall               → enforce change-time and structured-action boundaries
+CASA                   → govern runtime execution under a separately approved architecture
+Shared decision records → preserve evidence and replay
+```
 
-The deeper IP is the Action Firewall because it proves CASA can become executable policy instead of a slide deck.
+VIL, PromptBP, and the Governance Harness Toolkit may also provide independent signal, specification, or workflow support.
+
+This relationship is optional. It does not imply package ownership, cross-repository imports, mandatory service calls, shared deployment, or authority to modify another system.
+
+## Buyer-facing evaluation boundary
+
+The canonical evaluation contract is [`ai-coding-governance-pilot.md`](ai-coding-governance-pilot.md).
+
+The pilot proves bounded repository-specific behavior through controlled `REVIEW` and `HALT` evidence. It does not prove certification, universal compatibility, customer adoption, or enterprise production readiness.

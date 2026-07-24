@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">DiffWall AI Coding Governance Pilot workflow</title>
+  <desc id="desc">Five-stage governed pilot from repository inventory to recommendation handoff.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08111f"/>
+      <stop offset="1" stop-color="#1a2442"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <text x="95" y="105" fill="#f8fafc" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="54" font-weight="700">AI Coding Governance Pilot</text>
+  <text x="95" y="158" fill="#a9b7d0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="27">A bounded, evidence-backed evaluation path for engineering teams</text>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <line x1="280" y1="420" x2="395" y2="420" stroke="#7dd3fc" stroke-width="6" marker-end="url(#arrow)"/>
+    <line x1="575" y1="420" x2="690" y2="420" stroke="#7dd3fc" stroke-width="6" marker-end="url(#arrow)"/>
+    <line x1="870" y1="420" x2="985" y2="420" stroke="#7dd3fc" stroke-width="6" marker-end="url(#arrow)"/>
+    <line x1="1165" y1="420" x2="1280" y2="420" stroke="#7dd3fc" stroke-width="6" marker-end="url(#arrow)"/>
+
+    <g>
+      <circle cx="190" cy="420" r="105" fill="#12263f" stroke="#38bdf8" stroke-width="4"/>
+      <text x="190" y="397" text-anchor="middle" fill="#e0f2fe" font-size="28" font-weight="700">1</text>
+      <text x="190" y="440" text-anchor="middle" fill="#f0f9ff" font-size="27" font-weight="700">Inventory</text>
+      <text x="190" y="478" text-anchor="middle" fill="#a5d8f3" font-size="18">risk surfaces</text>
+    </g>
+
+    <g>
+      <circle cx="485" cy="420" r="105" fill="#17233f" stroke="#818cf8" stroke-width="4"/>
+      <text x="485" y="397" text-anchor="middle" fill="#e0e7ff" font-size="28" font-weight="700">2</text>
+      <text x="485" y="440" text-anchor="middle" fill="#eef2ff" font-size="27" font-weight="700">Policy</text>
+      <text x="485" y="478" text-anchor="middle" fill="#c7d2fe" font-size="18">smallest useful scope</text>
+    </g>
+
+    <g>
+      <circle cx="780" cy="420" r="105" fill="#28210f" stroke="#facc15" stroke-width="4"/>
+      <text x="780" y="397" text-anchor="middle" fill="#fef9c3" font-size="28" font-weight="700">3</text>
+      <text x="780" y="440" text-anchor="middle" fill="#fffbeb" font-size="27" font-weight="700">Fixtures</text>
+      <text x="780" y="478" text-anchor="middle" fill="#fde68a" font-size="18">ALLOW • REVIEW • HALT</text>
+    </g>
+
+    <g>
+      <circle cx="1075" cy="420" r="105" fill="#102b25" stroke="#34d399" stroke-width="4"/>
+      <text x="1075" y="397" text-anchor="middle" fill="#d1fae5" font-size="28" font-weight="700">4</text>
+      <text x="1075" y="440" text-anchor="middle" fill="#ecfdf5" font-size="27" font-weight="700">Evidence</text>
+      <text x="1075" y="478" text-anchor="middle" fill="#a7f3d0" font-size="18">route • reason • owner</text>
+    </g>
+
+    <g>
+      <circle cx="1370" cy="420" r="105" fill="#2c172c" stroke="#e879f9" stroke-width="4"/>
+      <text x="1370" y="397" text-anchor="middle" fill="#fae8ff" font-size="28" font-weight="700">5</text>
+      <text x="1370" y="440" text-anchor="middle" fill="#fdf4ff" font-size="27" font-weight="700">Handoff</text>
+      <text x="1370" y="478" text-anchor="middle" fill="#f5d0fe" font-size="18">proceed • condition • stop</text>
+    </g>
+  </g>
+
+  <rect x="150" y="650" width="1300" height="105" rx="24" fill="#0f1b31" stroke="#344763" stroke-width="2"/>
+  <text x="800" y="695" text-anchor="middle" fill="#f1f5f9" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="600">Pilot proof boundary</text>
+  <text x="800" y="732" text-anchor="middle" fill="#a9b7d0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21">Controlled branches only • no destructive execution • no automatic production gate • evidence retained before enforcement</text>
+
+  <text x="800" y="825" text-anchor="middle" fill="#7f91ad" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">DiffWall remains independently deployable and preserves explicit maturity limits.</text>
+</svg>

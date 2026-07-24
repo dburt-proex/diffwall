@@ -18,7 +18,11 @@ exec > >(tee -a "$ACTION_LOG_PATH") 2>&1
 echo "DiffWall action root: $ACTION_ROOT"
 echo "DiffWall caller workspace: $CALLER_WORKSPACE"
 echo "Node: $(node --version)"
-echo "npm: $(npm --version)"
+
+if [[ ! -f "$ACTION_ROOT/dist/cli.js" || ! -f "$ACTION_ROOT/dist/github-comment.js" ]]; then
+  echo "Committed DiffWall runtime bundle is missing." >&2
+  exit 90
+fi
 
 case "$FORMAT" in
   json) REPORT_PATH="$CALLER_WORKSPACE/diffwall-report.json" ;;
@@ -56,14 +60,7 @@ if [[ "$QUIET" == "true" ]]; then
   ARGS+=(--quiet)
 fi
 
-echo "Installing DiffWall dependencies..."
-cd "$ACTION_ROOT"
-npm install --no-audit --no-fund
-
-echo "Building DiffWall..."
-npm run build
-
-echo "Running DiffWall scan..."
+echo "Running committed DiffWall runtime..."
 cd "$CALLER_WORKSPACE"
 set +e
 node "$ACTION_ROOT/dist/cli.js" "${ARGS[@]}" | tee "$REPORT_PATH"
