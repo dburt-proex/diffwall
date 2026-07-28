@@ -1,12 +1,12 @@
 # DiffWall Pinned-Release Readiness
 
-**Status:** Release candidate evidence package  
-**Publication state:** `REVIEW`  
-**Automatic tag or release publication:** Prohibited
+**Status:** v0.2.0 release evidence package
+**Publication state:** `ALLOW` under the recorded owner decision
+**Automatic tag or release publication:** Allowed only after the exact `main` commit passes the complete Release readiness workflow
 
-This document defines the evidence required before DiffWall may be referenced by a pinned GitHub Action tag for production merge enforcement.
+This document defines the evidence required before DiffWall may be referenced by a pinned GitHub Action tag for controlled evaluation.
 
-It does not publish a release, authorize production use, or claim enterprise readiness.
+It does not authorize enterprise-readiness claims or unattended production use.
 
 ## Readiness decision
 
@@ -42,7 +42,7 @@ The repository-native workflow at `.github/workflows/release-readiness.yml` must
 
 ## Pinned release procedure
 
-After the candidate workflow succeeds, a human owner must complete these steps manually:
+After the candidate workflow succeeds, a human owner must complete these steps:
 
 1. Confirm the candidate commit SHA.
 2. Review all workflow jobs and uploaded evidence.
@@ -50,10 +50,12 @@ After the candidate workflow succeeds, a human owner must complete these steps m
 4. Confirm the package version and proposed tag agree.
 5. Confirm the tag has not already been used.
 6. Record the release decision and unresolved risks.
-7. Create an annotated tag only after explicit approval.
+7. Record explicit publication approval.
 8. Create release notes that preserve the maturity and claim boundaries.
 9. Update integration examples from `@main` to the approved immutable tag.
-10. Re-run a controlled `ALLOW`, `REVIEW`, and `HALT` validation against the tag.
+10. Permit the write-scoped publication workflow only after the read-only readiness workflow succeeds on `main`.
+
+For v0.2.0, these requirements are recorded in [`releases/v0.2.0-decision.md`](releases/v0.2.0-decision.md). The publisher rebuilds and retests the exact successful `main` commit, creates the tag and release once, attaches the action archive and checksum, and never moves an existing tag.
 
 ## Release decision states
 
@@ -77,4 +79,4 @@ It does not prove universal repository compatibility, zero vulnerabilities, comp
 
 Before publication, rollback means closing the draft pull request or reverting the candidate commits.
 
-After a future tag is published, the tag must never be silently moved. A defective release must be deprecated through a new documented decision and superseded by a new immutable tag.
+After a tag is published, the tag must never be silently moved. A defective release must be deprecated through a new documented decision and superseded by a new immutable tag.

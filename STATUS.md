@@ -1,17 +1,17 @@
 # DiffWall Status
 
-Last updated: 2026-07-23
+Last updated: 2026-07-28
 
 ## Current verdict
 
-DiffWall is an **early working deterministic enforcement firewall** with two independent control surfaces:
+DiffWall v0.2.0 is a **pinned, pilot-ready deterministic enforcement firewall** with two independent control surfaces:
 
 1. **PR Firewall** — TypeScript CLI and CI integrations that scan unified diffs, apply deterministic rules, score risk, and route changes to `ALLOW`, `REVIEW`, or `HALT`.
 2. **Action Firewall** — Python stdlib-only validator that evaluates structured AI or agent actions before execution.
 
 The repository includes live-controlled GitHub pull-request validation, PR comment delivery, evidence artifacts, merged SARIF output, CODEOWNERS-aware reviewer suggestions, GitLab CI guidance, Terraform and Python/Django policy packs, GitHub Actions workflow-risk fixtures, and a canonical buyer-facing pilot runbook.
 
-DiffWall is **not** a fully hardened enterprise DevSecOps product. Required production gates remain a pinned release, broader compatibility testing, supply-chain and operational security review, performance testing, and defined long-term evidence retention.
+DiffWall is **not** a fully hardened enterprise DevSecOps product. Remaining assurance gates include external repository and buyer validation, an independent security assessment, long-duration operation, and runtime implementation of the specified audit envelope.
 
 ## Canonical evidence
 
@@ -45,12 +45,12 @@ DiffWall is **not** a fully hardened enterprise DevSecOps product. Required prod
 | AI Coding Governance Pilot | Pilot-ready contract | Merged through PR #25; not yet externally buyer-validated. |
 | Runtime middleware integration | Not implemented | Future separately governed work. |
 | Long-lived audit export and retention | Not implemented | Future productization gate. |
-| Buyer-facing screenshots and demo media | Missing | Product proof backlog. |
-| Pinned action release | Missing | Required before production merge enforcement. |
+| Buyer-facing demo media | Working | Versioned `ALLOW` / `REVIEW` / `HALT` and pilot-workflow SVGs. |
+| Pinned action release | Released | Immutable `v0.2.0` publication is governed by the recorded owner decision and passing release-readiness workflow. |
 
 ## Safe claim
 
-> DiffWall is an early working PR and structured-action firewall. It scans diffs and structured actions, applies explainable deterministic risk rules, routes changes to `ALLOW`, `REVIEW`, or `HALT`, supports GitHub and GitLab-oriented CI patterns, and includes controlled live `REVIEW` and `HALT` proof.
+> DiffWall v0.2.0 is a pinned, pilot-ready PR and structured-action firewall. It scans diffs and structured actions, applies explainable deterministic risk rules, routes changes to `ALLOW`, `REVIEW`, or `HALT`, supports GitHub and GitLab-oriented CI patterns, and includes controlled live `REVIEW` and `HALT` proof.
 
 Do not claim full enterprise production readiness, certification, regulatory compliance, universal coverage, guaranteed risk prevention, or customer adoption without new evidence.
 
@@ -76,15 +76,13 @@ Operator Intelligence, CASA, VIL, PromptBP, and the Governance Harness Toolkit m
 - Node/Express, Python/Django, and Terraform policy packs;
 - GitHub Actions workflow-risk fixtures;
 - canonical AI Coding Governance Pilot.
+- immutable v0.2.0 release decision, release notes, pinned examples, and checksum-producing publication gate.
 
 ### Remaining
 
-- pinned action release;
-- broader repository and monorepo compatibility testing;
-- supply-chain and operational security review;
-- large-diff and performance testing;
-- long-lived audit export and retention strategy;
-- buyer-facing screenshots or demo media;
+- representative external repository and additional monorepo validation;
+- independent security assessment and long-duration operational evidence;
+- runtime implementation of the canonical audit envelope;
 - external pilot validation;
 - separately governed runtime middleware work.
 

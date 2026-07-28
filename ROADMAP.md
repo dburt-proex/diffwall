@@ -1,6 +1,6 @@
 # DiffWall Roadmap
 
-Last reconciled: 2026-07-23
+Last reconciled: 2026-07-28
 
 ## Current product state
 
@@ -46,25 +46,28 @@ Completed capability must not remain listed as future work. Future items below a
 - maturity and claim boundaries;
 - independent-system positioning.
 
-## Next release gates
+## Completed v0.2.0 release gates
 
 ### Pinned distribution
 
-- cut and document a pinned action release;
-- update examples to recommend the pinned tag;
-- verify installation and rollback instructions;
-- preserve `@main` as evaluation-only guidance.
+- governed `v0.2.0` publication decision;
+- pinned installation examples;
+- exact-lockfile CI and release rebuild;
+- immutable release rule and superseding-version rollback path;
+- release archive and SHA-256 checksum generation.
+
+## Next assurance gates
 
 ### Compatibility assurance
 
 - validate representative Node, Python, infrastructure, and mixed-language repositories;
 - test monorepo path and ownership behavior;
-- test very large diffs and performance limits;
+- validate additional real-world large diffs and performance limits;
 - document unsupported repository shapes and failure modes.
 
 ### Security and operational hardening
 
-- review action supply-chain and dependency behavior;
+- complete an independent action supply-chain and operational security assessment;
 - define token and permission guidance for forked pull requests;
 - verify report delivery fallbacks and operational-error handling;
 - define override, exception, and incident procedures;
@@ -72,14 +75,11 @@ Completed capability must not remain listed as future work. Future items below a
 
 ### Evidence and audit
 
-- define long-lived evidence retention;
 - add governed audit export beyond per-run reports and workflow artifacts;
-- define artifact integrity and replay expectations;
 - separate operational telemetry from policy decisions.
 
 ### Product proof
 
-- add buyer-facing screenshots or short demo media for `ALLOW`, `REVIEW`, and `HALT`;
 - execute the AI Coding Governance Pilot against an external test repository or consenting buyer environment;
 - record calibration findings and limitations;
 - create a concise buyer brief only after the canonical pilot contract remains stable.

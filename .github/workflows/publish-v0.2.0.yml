@@ -1,0 +1,83 @@
+name: Publish v0.2.0
+
+on:
+  workflow_run:
+    workflows: ["Release readiness"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-diffwall-v0.2.0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish authorized immutable release
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Verify owner authorization and release identity
+        env:
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+          test "$(node -p "require('./package.json').version")" = "0.2.0"
+          grep -q 'Decision: `ALLOW`' docs/releases/v0.2.0-decision.md
+          grep -q 'Tag: `v0.2.0`' docs/releases/v0.2.0-decision.md
+
+      - name: Rebuild and test exact release commit
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          git diff --exit-code -- dist
+          npm test
+          npm run release:verify
+          npm audit --audit-level=high
+          python -m unittest discover -s packages/action-firewall/tests -v
+
+      - name: Build release assets
+        run: |
+          mkdir -p artifacts/release
+          tar -czf artifacts/release/diffwall-action-v0.2.0.tgz \
+            action dist rules policy-packs package.json package-lock.json LICENSE
+          sha256sum artifacts/release/diffwall-action-v0.2.0.tgz \
+            > artifacts/release/diffwall-action-v0.2.0.sha256
+
+      - name: Publish GitHub Release once
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if gh release view v0.2.0 >/dev/null 2>&1; then
+            echo "v0.2.0 already exists; leaving the immutable release unchanged."
+            exit 0
+          fi
+
+          gh release create v0.2.0 \
+            --target "$RELEASE_SHA" \
+            --title "DiffWall v0.2.0" \
+            --notes-file docs/releases/v0.2.0.md \
+            artifacts/release/diffwall-action-v0.2.0.tgz \
+            artifacts/release/diffwall-action-v0.2.0.sha256

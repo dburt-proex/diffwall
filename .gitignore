@@ -6,4 +6,3 @@ diffwall-report.md
 .DS_Store
 __pycache__/
 *.pyc
-package-lock.json

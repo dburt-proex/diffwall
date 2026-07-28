@@ -16,14 +16,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Build
         run: npm run build
@@ -48,7 +48,7 @@ jobs:
           grep -q '"route": "HALT"' artifacts/pr-firewall/halt.json
 
       - name: Upload PR Firewall evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: diffwall-pr-firewall-evidence
           path: artifacts/pr-firewall
@@ -63,9 +63,9 @@ jobs:
         working-directory: packages/action-firewall
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -106,7 +106,7 @@ jobs:
           grep -q '"verdict": "HALT"' ../../artifacts/action-firewall/halt.json
 
       - name: Upload Action Firewall evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: diffwall-action-firewall-evidence
           path: artifacts/action-firewall

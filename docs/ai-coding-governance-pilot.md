@@ -70,7 +70,7 @@ The pilot must use controlled changes that are safe to close without merge.
 - Use the least privilege required for the selected proof path.
 - Do not provide production secrets, customer data, signing keys, or administrator credentials.
 - Treat PR comments as optional delivery. Artifact or step-summary evidence must remain available when comment permissions are absent.
-- Do not make DiffWall a required production merge gate while invoking `@main`. The current documentation recommends a pinned release before production enforcement.
+- Use the immutable `@v0.2.0` tag, never `@main`, for the pilot. Production enforcement requires a separately reviewed repository policy and named override authority.
 
 ## Merged capability baseline
 

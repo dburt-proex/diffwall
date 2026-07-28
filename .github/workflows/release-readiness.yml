@@ -3,6 +3,8 @@ name: Release readiness
 on:
   workflow_dispatch:
   pull_request:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -22,14 +24,14 @@ jobs:
         node: [20, 22]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
 
       - name: Install exact direct dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Build
         run: npm run build
@@ -73,7 +75,7 @@ jobs:
 
       - name: Upload release-readiness evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: diffwall-release-readiness-node-${{ matrix.node }}
           path: |
@@ -100,9 +102,9 @@ jobs:
         working-directory: packages/action-firewall
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
