@@ -44,8 +44,8 @@ jobs:
         run: |
           test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
           test "$(node -p "require('./package.json').version")" = "0.2.0"
-          grep -q 'Decision: `ALLOW`' docs/releases/v0.2.0-decision.md
-          grep -q 'Tag: `v0.2.0`' docs/releases/v0.2.0-decision.md
+          grep -Fq '**Decision:** `ALLOW`' docs/releases/v0.2.0-decision.md
+          grep -Fq '**Tag:** `v0.2.0`' docs/releases/v0.2.0-decision.md
 
       - name: Rebuild and test exact release commit
         run: |
