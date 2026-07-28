@@ -55,7 +55,7 @@ jobs:
           npm test
           npm run release:verify
           npm audit --audit-level=high
-          python -m unittest discover -s packages/action-firewall/tests -v
+          (cd packages/action-firewall && python -m unittest discover -s tests -v)
 
       - name: Build release assets
         run: |
