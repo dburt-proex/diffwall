@@ -1,8 +1,8 @@
 # DiffWall Supply-Chain and Operational Security Review
 
-**Review date:** 2026-07-23  
-**Scope:** PR Firewall, composite GitHub Action, Python Action Firewall, release-readiness workflow  
-**Decision:** `REVIEW` until the exact candidate commit passes the release-readiness workflow
+**Review date:** 2026-07-28
+**Scope:** PR Firewall, composite GitHub Action, Python Action Firewall, release-readiness and publication workflows
+**Decision:** `ALLOW` for the bounded v0.2.0 experimental release; `REVIEW` for enterprise production claims
 
 This review evaluates the security of distributing and operating DiffWall. It does not certify the project or replace an independent security assessment.
 
@@ -28,7 +28,7 @@ This review evaluates the security of distributing and operating DiffWall. It do
 
 | ID | Finding | Severity | Control or required disposition |
 |---|---|---:|---|
-| SEC-001 | JavaScript tooling dependencies could drift when ranges are used | High | Direct development dependencies are pinned to exact versions; dependency tree and audit evidence are captured on the canonical Node release job. |
+| SEC-001 | JavaScript tooling dependencies could drift when ranges are used | High | Direct development dependencies and the complete npm lockfile are committed; CI uses `npm ci`; dependency tree and audit evidence are captured on the canonical Node release job. |
 | SEC-002 | Installing and compiling tooling inside every caller repository expands the runtime supply chain | High | The composite action now runs a committed `dist/` runtime bundle and performs no npm install or TypeScript build in the caller workspace. CI rebuilds source and proves the committed runtime matches. |
 | SEC-003 | Untrusted diff content may contain commands, secrets, or prompt-injection text | High | DiffWall parses input as data, does not execute changed code, redacts secret-like evidence, and runs with read-only contents permission by default. |
 | SEC-004 | PR comment delivery requires write permission | Medium | `pull-requests: write` is optional and scoped to comment delivery. Report artifacts and step summaries remain valid when the token is absent or denied. |
@@ -36,7 +36,7 @@ This review evaluates the security of distributing and operating DiffWall. It do
 | SEC-006 | Large inputs could exhaust time or memory | Medium | Git diff reads use a bounded 256 MiB buffer; the release workflow runs a deterministic large-diff benchmark and records duration and input size. |
 | SEC-007 | Workflow artifacts could retain sensitive evidence too long | Medium | Retention classes and redaction requirements are defined in [`audit-retention-and-export.md`](audit-retention-and-export.md). |
 | SEC-008 | Floating action references may change upstream behavior | Medium | Official actions are restricted to required steps and least privilege. Commit-SHA pinning remains recommended before a hardened enterprise release. |
-| SEC-009 | Release automation could publish without human review | Critical | The readiness workflow uploads evidence only. It has no tag, release, package-publish, deployment, or write permission. Publication remains manual and REVIEW-gated. |
+| SEC-009 | Release automation could publish without human review | Critical | The readiness workflow remains read-only. The separate publisher requires the recorded owner `ALLOW`, triggers only after a successful `main` readiness run, rebuilds the exact commit, publishes v0.2.0 once, and never moves an existing release. |
 | SEC-010 | Historical CASA language could imply an unapproved runtime dependency | Medium | Current authority is documented in README and [`architecture-history.md`](architecture-history.md); DiffWall remains independently deployable. |
 
 ## Supply-chain controls
@@ -45,12 +45,13 @@ This review evaluates the security of distributing and operating DiffWall. It do
 - committed JavaScript runtime bundle used by the composite action;
 - no npm installation or compilation in the caller repository;
 - exact direct development dependency versions for source validation;
+- committed npm lockfile and `npm ci` for deterministic installation;
 - source build compared against committed runtime in CI;
 - dependency-tree evidence captured in CI;
 - high-severity npm audit check captured on the canonical Node 20 release job;
 - candidate archive and SHA-256 checksum captured as evidence;
 - read-only workflow permissions;
-- no automatic tag, release, npm publish, or deployment behavior;
+- write-scoped publication isolated from the read-only readiness workflow and bounded to the authorized v0.2.0 release;
 - Apache-2.0 license retained.
 
 ## Operational controls
@@ -67,15 +68,15 @@ This review evaluates the security of distributing and operating DiffWall. It do
 
 ## Required pre-release checks
 
-- [ ] Committed runtime bundle matches a clean TypeScript build.
-- [ ] Composite action completes controlled routes without dependency installation.
-- [ ] TypeScript build and tests pass on Node 20 and 22.
-- [ ] Python Action Firewall tests pass on Python 3.11 and 3.12.
-- [ ] High-severity dependency audit passes on the canonical release toolchain.
-- [ ] Large-diff benchmark passes and produces evidence.
-- [ ] Candidate archive checksum is recorded.
-- [ ] PR comment and report artifacts contain no live secrets or customer data.
-- [ ] Human owner approves the exact candidate commit.
+- [x] Committed runtime bundle matches a clean TypeScript build.
+- [x] Composite action completes controlled routes without dependency installation.
+- [x] TypeScript build and tests pass on Node 20 and 22.
+- [x] Python Action Firewall tests pass on Python 3.11 and 3.12.
+- [x] High-severity dependency audit passes on the canonical release toolchain.
+- [x] Large-diff benchmark passes and produces evidence.
+- [x] Candidate archive checksum is recorded.
+- [x] Synthetic PR comment and report artifacts contain no live secrets or customer data.
+- [x] Human owner approves the bounded release target through the recorded publication gate.
 
 ## Residual risk
 

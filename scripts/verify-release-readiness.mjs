@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 
 const requiredFiles = [
+  "package-lock.json",
   "action/action.yml",
   "action/entrypoint.sh",
   "dist/cli.js",
@@ -14,7 +15,9 @@ const requiredFiles = [
   "docs/buyer-validation-protocol.md",
   "docs/architecture-history.md",
   "docs/demo-media/allow-review-halt.svg",
-  "docs/demo-media/pilot-workflow.svg"
+  "docs/demo-media/pilot-workflow.svg",
+  "docs/releases/v0.2.0-decision.md",
+  "docs/releases/v0.2.0.md"
 ];
 
 const failures = [];
@@ -23,6 +26,7 @@ for (const file of requiredFiles) {
 }
 
 const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
+const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(packageJson.version ?? "")) {
   failures.push(`package.json version is not valid semver: ${String(packageJson.version)}`);
 }
@@ -34,7 +38,17 @@ for (const [name, version] of Object.entries(packageJson.devDependencies ?? {}))
 }
 
 if (Object.keys(packageJson.dependencies ?? {}).length !== 0) {
-  failures.push("runtime dependencies must remain empty for the current action release candidate");
+  failures.push("runtime dependencies must remain empty for the current action release");
+}
+
+if (packageLock.version !== packageJson.version) {
+  failures.push(
+    `package-lock.json version ${String(packageLock.version)} does not match package.json version ${String(packageJson.version)}`
+  );
+}
+
+if (packageLock.packages?.[""]?.version !== packageJson.version) {
+  failures.push("package-lock.json root package version does not match package.json");
 }
 
 const actionManifest = readFileSync("action/action.yml", "utf8");
@@ -43,8 +57,18 @@ if (!actionManifest.includes("using: composite")) {
 }
 
 const readme = readFileSync("README.md", "utf8");
-if (!readme.includes("Pin a release tag") && !readme.includes("pinned release")) {
-  failures.push("README.md does not preserve the pinned-release production warning");
+if (!readme.includes("dburt-proex/diffwall/action@v0.2.0")) {
+  failures.push("README.md does not use the approved pinned v0.2.0 action reference");
+}
+
+const releaseDecision = readFileSync("docs/releases/v0.2.0-decision.md", "utf8");
+const publicationAuthorized =
+  releaseDecision.includes("Decision:** `ALLOW`") &&
+  releaseDecision.includes("Tag:** `v0.2.0`") &&
+  packageJson.version === "0.2.0";
+
+if (!publicationAuthorized) {
+  failures.push("v0.2.0 publication is not authorized by the canonical release decision");
 }
 
 if (failures.length > 0) {
@@ -55,12 +79,12 @@ if (failures.length > 0) {
 process.stdout.write(
   `${JSON.stringify(
     {
-      status: "READY_FOR_REVIEW",
+      status: "READY_FOR_PUBLICATION",
       packageVersion: packageJson.version,
       requiredArtifacts: requiredFiles.length,
       directRuntimeDependencies: 0,
       directDevelopmentDependenciesPinned: Object.keys(packageJson.devDependencies ?? {}).length,
-      publicationAuthorized: false,
+      publicationAuthorized,
       externalBuyerValidationComplete: false
     },
     null,

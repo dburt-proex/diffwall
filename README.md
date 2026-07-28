@@ -4,7 +4,7 @@ A deterministic enforcement firewall for AI-generated code and agent actions.
 
 DiffWall scans pull-request diffs and structured agent actions, applies transparent repository-local policy, and routes each change to `ALLOW`, `REVIEW`, or `HALT`.
 
-> **Current status:** early working enforcement system with live-validated GitHub pull-request integration, deterministic route evidence, policy packs, SARIF output, CODEOWNERS-aware reviewer suggestions, GitLab CI guidance, and a bounded buyer-facing pilot. DiffWall is not yet a fully hardened enterprise DevSecOps product.
+> **Current status:** v0.2.0 is a pinned, pilot-ready release with live-validated GitHub pull-request integration, deterministic route evidence, policy packs, SARIF output, CODEOWNERS-aware reviewer suggestions, GitLab CI guidance, and a bounded buyer-facing pilot. DiffWall is not yet a fully hardened enterprise DevSecOps product.
 
 ## Product boundary
 
@@ -114,16 +114,16 @@ jobs:
   diffwall:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
 
       - name: Run DiffWall
-        uses: dburt-proex/diffwall/action@main
+        uses: dburt-proex/diffwall/action@v0.2.0
         with:
           base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
@@ -133,7 +133,7 @@ jobs:
           github_token: ${{ github.token }}
 ```
 
-This invocation has been exercised in controlled real pull requests. **Pin a release tag rather than `main` before making DiffWall a required production merge gate.**
+This invocation has been exercised in controlled real pull requests. Use the immutable `v0.2.0` tag for controlled evaluation and pilots. Production enforcement still requires a reviewed repository policy, human override ownership, and acceptance of the documented maturity limits.
 
 See [`docs/github-action.md`](docs/github-action.md) for the integration contract.
 
@@ -147,7 +147,7 @@ DiffWall can run as a plain Node CLI in GitLab merge-request pipelines. See:
 ## Local development
 
 ```bash
-npm install
+npm ci
 npm run build
 npm test
 npm run scan:demo
@@ -192,7 +192,7 @@ python -m diffwall.cli validate examples/actions/halt_delete_prod_db.json
 
 Safe current claim:
 
-> DiffWall is an early working PR and structured-action firewall. It applies explainable deterministic rules, routes changes to `ALLOW`, `REVIEW`, or `HALT`, supports repository-local CI integration, and includes live-controlled `REVIEW` and `HALT` evidence.
+> DiffWall v0.2.0 is a pinned, pilot-ready PR and structured-action firewall. It applies explainable deterministic rules, routes changes to `ALLOW`, `REVIEW`, or `HALT`, supports repository-local CI integration, and includes live-controlled `REVIEW` and `HALT` evidence.
 
 Do not claim:
 
@@ -204,15 +204,14 @@ Do not claim:
 - unattended production autonomy;
 - customer adoption not supported by evidence.
 
-## Remaining release gates
+## Remaining assurance gates
 
-- cut and document a pinned action release;
-- broaden compatibility testing across representative repositories and monorepos;
-- complete supply-chain and operational security review;
-- test large-diff and performance behavior;
-- define long-lived audit retention and export;
-- add buyer-facing screenshots or demo media;
+- validate representative external repositories and additional monorepo shapes;
+- complete an independent security assessment and long-duration operational validation;
+- implement the specified long-lived audit envelope exporter;
 - validate the pilot with an external repository or buyer.
+
+Release evidence and the governed publication decision are recorded in [`docs/releases/v0.2.0-decision.md`](docs/releases/v0.2.0-decision.md).
 
 See [`STATUS.md`](STATUS.md), [`ROADMAP.md`](ROADMAP.md), and [`CHANGELOG.md`](CHANGELOG.md) for the current maturity record.
 

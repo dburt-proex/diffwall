@@ -68,29 +68,26 @@ The live tests demonstrate that DiffWall can currently:
 
 These tests do not establish full enterprise production readiness. Remaining hardening areas include:
 
-- pinned release distribution;
 - compatibility testing across representative repository types;
-- security review of the action supply chain;
-- performance testing on very large diffs and monorepos;
-- SARIF and native check-run annotations;
-- CODEOWNERS-aware routing and policy packs;
-- retention and export strategy for long-lived audit evidence.
+- independent security assessment and long-duration operation;
+- external repository and buyer validation;
+- runtime implementation of the specified long-lived audit envelope.
 
 ## Reproduction pattern
 
 A repository can reproduce the validated integration with:
 
 ```yaml
-- uses: actions/checkout@v4
+- uses: actions/checkout@v7
   with:
     fetch-depth: 0
 
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
     node-version: 20
 
 - name: Run DiffWall
-  uses: dburt-proex/diffwall/action@main
+  uses: dburt-proex/diffwall/action@v0.2.0
   with:
     base: ${{ github.event.pull_request.base.sha }}
     head: HEAD
@@ -100,4 +97,4 @@ A repository can reproduce the validated integration with:
     github_token: ${{ github.token }}
 ```
 
-Pin a release tag rather than `main` before using DiffWall as a required production merge gate.
+Use the pinned `v0.2.0` tag for controlled evaluation. Production enforcement requires a reviewed repository policy, named override ownership, and acceptance of the documented maturity limits.

@@ -4,9 +4,9 @@
 
 No unreleased changes recorded.
 
-## v0.2.0 — 2026-07-24
+## v0.2.0 — 2026-07-28
 
-Release-candidate line for DiffWall's pilot-ready, independently deployable GitHub Action.
+First pinned, pilot-ready release of DiffWall's independently deployable GitHub Action.
 
 ### Added
 
@@ -23,6 +23,8 @@ Release-candidate line for DiffWall's pilot-ready, independently deployable GitH
 - Nested monorepo, CRLF, strict-route, ignored-documentation, and self-scan regression coverage.
 - Synthetic large-diff benchmark, package inventory, dependency-tree audit, candidate archive, and checksum evidence.
 - Security review, audit-retention and export contract, buyer-validation protocol, demo media, and architecture-history records.
+- Owner-authorized release decision, immutable release workflow, pinned integration examples, release archive, and checksum.
+- Committed npm lockfile for reproducible dependency installation.
 
 ### Changed
 
@@ -33,10 +35,11 @@ Release-candidate line for DiffWall's pilot-ready, independently deployable GitH
 - Clarified the distinction between working capability, live-controlled proof, pilot-ready capability, and future production hardening.
 - Pinned direct development dependency versions and upgraded Vitest to `3.2.7` for the audited candidate graph.
 - Hardened the action entrypoint to fail closed when committed runtime files are absent.
+- Upgraded maintained official GitHub Actions to their Node 24-era major versions and changed CI installs to `npm ci`.
 
 ### Current maturity limits
 
-- This entry defines a release candidate; no immutable `v0.2.0` tag or GitHub Release is created by this change.
+- `v0.2.0` is an immutable experimental release for controlled evaluation and pilots, not an enterprise-readiness claim.
 - External buyer validation remains incomplete.
 - The performance fixture is synthetic and does not establish universal repository performance.
 - Audit retention and export are specified; a dedicated runtime envelope exporter remains future work.
@@ -73,4 +76,4 @@ Initial action-first release of DiffWall.
 
 - No npm package published.
 - GitHub Action builds from the action checkout on each run.
-- Production enforcement requires a pinned release and broader hardening.
+- Production enforcement requires broader hardening and a reviewed repository-specific policy.

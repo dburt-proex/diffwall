@@ -9,10 +9,10 @@ action/action.yml
 Use it from another repository with:
 
 ```yaml
-uses: dburt-proex/diffwall/action@main
+uses: dburt-proex/diffwall/action@v0.2.0
 ```
 
-The action has been validated in real `REVIEW` and `HALT` pull-request workflows. Pin a release tag instead of `main` before making it a required production merge gate.
+The action has been validated in real `REVIEW` and `HALT` pull-request workflows. Use the immutable `v0.2.0` tag for controlled evaluation and pilots.
 
 ---
 
@@ -33,16 +33,16 @@ jobs:
   diffwall:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
 
       - name: Run DiffWall
-        uses: dburt-proex/diffwall/action@main
+        uses: dburt-proex/diffwall/action@v0.2.0
         with:
           base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
@@ -84,7 +84,7 @@ Forked pull requests may receive a read-only token depending on repository setti
 ## Local equivalent
 
 ```bash
-npm install
+npm ci
 npm run build
 npx tsx src/cli.ts scan --base origin/main --head HEAD --format markdown --fail-on-halt
 ```
@@ -93,6 +93,6 @@ npx tsx src/cli.ts scan --base origin/main --head HEAD --format markdown --fail-
 
 ## Current maturity
 
-The composite action is live-validated for loading, dependency installation, build, scanning, evidence generation, PR comment creation/update, `REVIEW` routing, and `HALT` enforcement. In the controlled HALT proof, the report and comment were published before the workflow failed as designed. TypeScript and Python CI jobs also generate ALLOW / REVIEW / HALT evidence artifacts.
+The composite action is live-validated for loading, scanning, evidence generation, PR comment creation/update, `REVIEW` routing, and `HALT` enforcement without dependency installation in the caller repository. In the controlled HALT proof, the report and comment were published before the workflow failed as designed. TypeScript and Python CI jobs also generate ALLOW / REVIEW / HALT evidence artifacts.
 
-Next release gate: cut and document a pinned action tag, then expand compatibility testing across representative Node, Python, infrastructure, and monorepo repositories.
+The next assurance gate is external validation across representative repositories and additional monorepo shapes.
