@@ -1,0 +1,13 @@
+[project]
+name = "governed-revenue-operator"
+version = "0.1.0"
+description = "Governed outreach-to-first-revenue orchestration proof"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
