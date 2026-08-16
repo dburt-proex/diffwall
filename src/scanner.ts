@@ -14,7 +14,12 @@ function looksLikeDiff(diff: string): boolean {
 
 export function scanDiff(diff: string, config: DiffWallConfig, codeowners: CodeownersEntry[] = []): ScanResult {
   const parsed = parseUnifiedDiff(diff);
-  const files = parsed.filter((file) => !matchesAny(file.path, config.ignorePaths));
+  // Protected control surfaces must never disappear merely because a broader
+  // ignore glob also matches them. This matters for Markdown-based agent and
+  // skill definitions such as AGENTS.md and SKILL.md.
+  const files = parsed.filter((file) =>
+    !matchesAny(file.path, config.ignorePaths) || matchesAny(file.path, config.protectedPaths)
+  );
   const findings = defaultRules.flatMap((rule) => rule(files, config));
 
   // Fail safe: content that looks like a diff but parsed into zero files must
