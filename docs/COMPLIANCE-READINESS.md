@@ -19,11 +19,13 @@ DiffWall is assessed as the change-time enforcement surface for repository diffs
 - Controlled real-PR REVIEW/HALT proof and evidence artifacts.
 - CODEOWNERS-aware reviewer suggestions and negative fixtures.
 - Explicit claim boundary in `STATUS.md`.
+- On the compliance PR, the primary CI, DiffWall workflow, action-firewall CI, and compliance-baseline validation passed; the release-readiness gate correctly blocked on a high-severity dependency audit finding.
 
 ## Gap register
 
 | Priority | Control | Gap | Closure evidence |
 |---|---|---|---|
+| P0 | SEC-001 | Release-readiness run `31989256302` failed `npm audit --audit-level=high`; evidence identified transitive dev dependency `nanoid@3.3.16` via `vitest → vite → postcss`, advisory `GHSA-2v37-7h3g-55p8`, severity high, fix available | reproducible package-manager remediation + green high-severity audit + retained audit artifact; independent security assessment remains a later assurance step |
 | P0 | LOG-001 | Long-lived audit export/retention not implemented | canonical audit envelope + retained export + integrity check |
 | P0 | INC-001 | Full incident process absent | IR SOP + tabletop + RCA + CAPA/retest record |
 | P0 | DAT-001 | Data governance absent | data inventory/classification/retention/deletion policy |
@@ -33,7 +35,6 @@ DiffWall is assessed as the change-time enforcement surface for repository diffs
 | P1 | IAM-001 | Reviewer suggestions are not access governance | access inventory + privilege review evidence |
 | P1 | AI-001 | Change-time AI governance is not full AI lifecycle governance | AI inventory + TEVV + monitoring + retirement records |
 | P1 | REV-001 | Release readiness is not recurring internal audit/management review | audit report + management review + CAPA status |
-| P1 | SEC-001 | Independent security assessment outstanding | independent security assessment and closure receipt |
 
 ## Validation workflow
 
@@ -41,8 +42,9 @@ DiffWall is assessed as the change-time enforcement surface for repository diffs
 2. Execute TypeScript/Python CI, route fixtures, action self-tests, release-readiness checks and representative controlled PR validation.
 3. Generate canonical CASA evidence receipts for each control test rather than relying only on prose status claims.
 4. Preserve the exact commit SHA, workflow run, finding output and reviewer/owner decision.
-5. Close or formally accept residual P0 risks.
-6. Re-run the readiness assessment before external assurance.
+5. For dependency findings, remediate through the package manager and regenerate the lockfile; do not hand-edit integrity metadata.
+6. Close or formally accept residual P0 risks.
+7. Re-run the readiness assessment before external assurance.
 
 ## Phase 10 entry criteria
 
