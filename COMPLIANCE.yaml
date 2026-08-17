@@ -31,9 +31,9 @@ controls:
     status: IMPLEMENTED
     evidence: [docs/live-validation-case-study.md, docs/ai-coding-governance-pilot.md, src/output, .github/workflows/release-readiness.yml]
   SEC-001:
-    status: IMPLEMENTED
-    evidence: [SECURITY.md, demo/diffs, src, tests]
-    note: Deterministic security/change rules and negative fixtures exist; independent security assessment remains outstanding.
+    status: PARTIAL
+    evidence: [SECURITY.md, demo/diffs, src, tests, .github/workflows/release-readiness.yml]
+    gap: Release-readiness run 31989256302 failed the Node 20 high-severity dependency audit. Evidence artifact identified nanoid 3.3.16 as a high-severity transitive development dependency vulnerability (GHSA-2v37-7h3g-55p8) with a fix available; reproducible package-manager remediation and independent security assessment remain outstanding.
   INC-001:
     status: PARTIAL
     evidence: [STATUS.md, .github/workflows/release-readiness.yml]
@@ -59,6 +59,6 @@ controls:
     evidence: [.github/workflows/release-readiness.yml, STATUS.md, docs/ai-coding-governance-pilot.md]
     gap: Release readiness exists; recurring internal audit and management review are not formalized.
 remediation:
-  p0: [LOG-001, INC-001, DAT-001, SUP-001, BCM-001]
-  p1: [RSK-001, IAM-001, AI-001, REV-001, SEC-001]
+  p0: [SEC-001, LOG-001, INC-001, DAT-001, SUP-001, BCM-001]
+  p1: [RSK-001, IAM-001, AI-001, REV-001]
   external_assurance_gate: blocked_until_p0_closed_or_formally_risk_accepted
