@@ -1,5 +1,7 @@
 # DiffWall
 
+**Portfolio evidence:** [Systems & proof](https://drew-burt-portfolio.daxxer-os.chatgpt.site/systems) · [Governance Lab](https://drew-burt-portfolio.daxxer-os.chatgpt.site/lab) · [v0.2.0 release evidence](https://github.com/dburt-proex/DDBPORTFOLIO.git.io/blob/main/diffwall-v0.2.0-release.html)
+
 A deterministic enforcement firewall for AI-generated code and agent actions.
 
 DiffWall scans pull-request diffs and structured agent actions, applies transparent repository-local policy, and routes each change to `ALLOW`, `REVIEW`, or `HALT`.
