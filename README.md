@@ -16,7 +16,7 @@ Those systems may be used independently around DiffWall:
 
 - **Operator Intelligence** may assess and prioritize governance gaps.
 - **DiffWall** enforces change-time and structured-action boundaries.
-- **CASA** is a separate runtime-governance architecture with unresolved canonical repository ownership.
+- **CASA** is a separate runtime-governance architecture maintained at [`dburt-proex/casa`](https://github.com/dburt-proex/casa).
 - **VIL**, **PromptBP**, and the **Governance Harness Toolkit** are optional independent supporting systems.
 
 No cross-repository runtime dependency is implied.
