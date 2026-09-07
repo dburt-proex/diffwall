@@ -1,0 +1,32 @@
+{
+  "policy_id": "gro-default-v0.1",
+  "default_unknown_route": "REVIEW",
+  "approval_ttl_hours": 72,
+  "approval_required": [
+    "IDENTIFY_TARGET",
+    "SEND_OUTREACH",
+    "SCHEDULE_FOLLOWUP",
+    "SEND_PROPOSAL",
+    "ISSUE_INVOICE"
+  ],
+  "unconditional_halt": [
+    "ACCEPT_CONTRACT",
+    "TRANSFER_FUNDS",
+    "DELETE_RECORD",
+    "PUBLIC_BROADCAST"
+  ],
+  "revenue_evidence": {
+    "accepted_sources": [
+      "PAYMENT_PROVIDER",
+      "BANK_SETTLEMENT"
+    ],
+    "required_status": "SETTLED"
+  },
+  "data_rules": {
+    "restricted_external_route": "HALT",
+    "confidential_external_route": "HALT",
+    "log_minimization": true,
+    "secret_redaction_required": true
+  }
+}
+

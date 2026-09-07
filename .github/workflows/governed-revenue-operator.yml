@@ -1,0 +1,51 @@
+name: Governed Revenue Operator
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "incubator/governed-revenue-operator/**"
+      - ".github/workflows/governed-revenue-operator.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  governed-proof:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    defaults:
+      run:
+        working-directory: incubator/governed-revenue-operator
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Compile
+        run: PYTHONPATH=src python -m compileall -q src tests
+
+      - name: Unit and workflow tests
+        run: PYTHONPATH=src python -m unittest discover -s tests -v
+
+      - name: Generate synthetic run receipt
+        run: |
+          PYTHONPATH=src python -m governed_revenue_operator.demo > synthetic-run-receipt.json
+          grep -q '"final_state": "FIRST_REVENUE_VERIFIED"' synthetic-run-receipt.json
+          grep -q '"ledger_valid": true' synthetic-run-receipt.json
+
+      - name: Upload synthetic evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: governed-revenue-operator-python-${{ matrix.python-version }}
+          path: incubator/governed-revenue-operator/synthetic-run-receipt.json
+          if-no-files-found: error
+
