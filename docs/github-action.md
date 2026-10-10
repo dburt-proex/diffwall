@@ -142,7 +142,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-          path: candidate
           persist-credentials: false
       - uses: actions/checkout@v7
         with:
@@ -154,8 +153,6 @@ jobs:
           node-version: 22
       # Placeholder: replace with an exact reviewed hardening commit SHA.
       - uses: dburt-proex/diffwall/action@REPLACE_WITH_REVIEWED_COMMIT_SHA
-        env:
-          GITHUB_WORKSPACE: ${{ github.workspace }}/candidate
         with:
           base: ${{ github.event.pull_request.base.sha }}
           head: ${{ github.event.pull_request.head.sha }}
@@ -169,9 +166,9 @@ jobs:
         with:
           name: diffwall-hardened-evidence
           path: |
-            candidate/diffwall-report.json
-            candidate/diffwall-policy-evidence.json
-            candidate/diffwall-action.log
+            diffwall-report.json
+            diffwall-policy-evidence.json
+            diffwall-action.log
           if-no-files-found: error
 ```
 
