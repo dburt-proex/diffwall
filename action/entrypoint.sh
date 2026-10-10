@@ -10,6 +10,12 @@ FAIL_ON_HALT="${DIFFWALL_FAIL_ON_HALT:-true}"
 FAIL_ON_REVIEW="${DIFFWALL_FAIL_ON_REVIEW:-false}"
 REQUIRE_CONFIG="${DIFFWALL_REQUIRE_CONFIG:-false}"
 QUIET="${DIFFWALL_QUIET:-false}"
+for name in FAIL_ON_HALT FAIL_ON_REVIEW REQUIRE_CONFIG QUIET; do
+  if [[ "${!name}" != "true" && "${!name}" != "false" ]]; then
+    echo "DiffWall error: $name must be true or false" >&2
+    exit 1
+  fi
+done
 CALLER_WORKSPACE="${GITHUB_WORKSPACE:-$PWD}"
 ACTION_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ACTION_LOG_PATH="$CALLER_WORKSPACE/diffwall-action.log"
@@ -70,20 +76,25 @@ fi
 echo "Running committed DiffWall runtime..."
 cd "$CALLER_WORKSPACE"
 # Separate provenance evidence keeps the existing report schema unchanged.
-DIFFWALL_EVIDENCE_CONFIG="${CONFIG_PATH:-}" DIFFWALL_EVIDENCE_BASE="$BASE" DIFFWALL_EVIDENCE_HEAD="$HEAD" node --input-type=commonjs <<'NODE'
+DIFFWALL_EVIDENCE_CONFIG="${CONFIG_PATH:-}" DIFFWALL_EVIDENCE_DIFF="$DIFF" DIFFWALL_EVIDENCE_BASE="$BASE" DIFFWALL_EVIDENCE_HEAD="$HEAD" node --input-type=commonjs <<'NODE'
 const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const config = process.env.DIFFWALL_EVIDENCE_CONFIG;
+const diff = process.env.DIFFWALL_EVIDENCE_DIFF;
+const diffPath = diff ? path.resolve(diff) : null;
 function revision(ref, cwd = process.cwd()) {
   try { return execFileSync('git', ['rev-parse', '--verify', '--end-of-options', `${ref}^{commit}`], {cwd, encoding:'utf8', stdio:['ignore','pipe','ignore']}).trim(); }
   catch { return null; }
 }
 const exists = config && fs.existsSync(config);
 fs.writeFileSync('diffwall-policy-evidence.json', JSON.stringify({
-  base_sha: revision(process.env.DIFFWALL_EVIDENCE_BASE),
-  head_sha: revision(process.env.DIFFWALL_EVIDENCE_HEAD),
+  scan_source: diff ? 'diff-file' : 'git-refs',
+  diff_path: diffPath,
+  diff_sha256: diffPath && fs.existsSync(diffPath) ? createHash('sha256').update(fs.readFileSync(diffPath)).digest('hex') : null,
+  base_sha: diff ? null : revision(process.env.DIFFWALL_EVIDENCE_BASE),
+  head_sha: diff ? null : revision(process.env.DIFFWALL_EVIDENCE_HEAD),
   policy_path: config || null,
   policy_sha256: exists ? createHash('sha256').update(fs.readFileSync(config)).digest('hex') : null,
   policy_checkout_sha: exists ? revision('HEAD', path.dirname(config)) : null,
@@ -92,15 +103,23 @@ fs.writeFileSync('diffwall-policy-evidence.json', JSON.stringify({
 NODE
 set +e
 node "$ACTION_ROOT/dist/cli.js" "${ARGS[@]}" | tee "$REPORT_PATH"
-SCAN_STATUS=${PIPESTATUS[0]}
+PIPE_STATUSES=("${PIPESTATUS[@]}")
+SCAN_STATUS=${PIPE_STATUSES[0]}
+REPORT_STATUS=${PIPE_STATUSES[1]}
 set -e
-DIFFWALL_SCAN_STATUS="$SCAN_STATUS" DIFFWALL_REPORT_PATH="$REPORT_PATH" node --input-type=commonjs <<'NODE'
+DIFFWALL_SCAN_STATUS="$SCAN_STATUS" DIFFWALL_REPORT_STATUS="$REPORT_STATUS" DIFFWALL_REPORT_PATH="$REPORT_PATH" node --input-type=commonjs <<'NODE'
 const fs = require('node:fs');
 const evidence = JSON.parse(fs.readFileSync('diffwall-policy-evidence.json', 'utf8'));
 evidence.scan_exit_status = Number(process.env.DIFFWALL_SCAN_STATUS);
+evidence.report_write_exit_status = Number(process.env.DIFFWALL_REPORT_STATUS);
 evidence.report_path = process.env.DIFFWALL_REPORT_PATH;
 fs.writeFileSync('diffwall-policy-evidence.json', JSON.stringify(evidence, null, 2) + '\n');
 NODE
+
+if [[ "$REPORT_STATUS" -ne 0 ]]; then
+  echo "DiffWall error: failed to persist scan report" >&2
+  exit 1
+fi
 
 if [[ -n "${DIFFWALL_COMMENT_TOKEN:-}" && "$FORMAT" == "markdown" && "$QUIET" != "true" ]]; then
   set +e

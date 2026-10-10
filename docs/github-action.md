@@ -12,7 +12,9 @@ Use it from another repository with:
 uses: dburt-proex/diffwall/action@v0.2.0
 ```
 
-The action has been validated in real `REVIEW` and `HALT` pull-request workflows. Use the immutable `v0.2.0` tag for controlled evaluation and pilots.
+The action has been validated in real `REVIEW` and `HALT` pull-request workflows.
+Use `v0.2.0` for controlled evaluation and pilots. For an immutable code reference,
+pin its exact commit SHA; a version tag alone is not a platform immutability guarantee.
 
 ---
 
@@ -112,6 +114,11 @@ CLI equivalents are `--require-config` and `--fail-on-review`. HALT remains exit
 when `fail_on_halt` is enabled. Enable both route flags for hardened enforcement.
 Existing invocations retain their previous defaults and report schema.
 
+The development test toolchain is pinned to patched Vitest 4.1.11. Its resolved
+Vite dependency requires Node 20.19+ or 22.12+ (or a supported newer release);
+the Node 20/22 CI jobs use current patch releases. The committed action runtime
+still has no npm runtime dependencies and retains its Node 20+ contract.
+
 Required policy format is the documented block subset: all four sections
 (`thresholds`, `ignorePaths`, `protectedPaths`, `haltPatterns`) must be explicitly
 present, with both numeric `review` and `halt` thresholds. List entries use two-space
@@ -172,13 +179,19 @@ jobs:
           if-no-files-found: error
 ```
 
-`diffwall-policy-evidence.json` records resolved base/head commit SHAs, the policy
+`diffwall-policy-evidence.json` records the scan source, resolved base/head commit SHAs, the policy
 file's SHA-256, its checkout HEAD when available, the report path, and scan exit
-status. The route and findings stay in the accompanying report. A checkout HEAD
+status and report-write exit status. For saved-diff input it records the diff path
+and SHA-256 and leaves base/head SHAs null, since those commits were not scanned.
+Saved-diff evidence must not be treated as validation of the current PR commits.
+The route and findings stay in the accompanying report. A checkout HEAD
 is provenance metadata, not proof the file is unmodified or authorized. Bind an
 approval to the head SHA, base-policy revision, and policy hash; never approve a
 mutable branch name. Null provenance must be investigated rather than invented.
 Preserve both evidence files even on REVIEW, HALT, or operational failure.
+The CLI allows pending output to flush before REVIEW/HALT enforcement. The action
+fails on report-write errors and invalid boolean inputs. Unknown CLI options and
+missing option values fail instead of silently disabling an enforcement flag.
 
 ### Human approval boundary
 

@@ -65,8 +65,9 @@ function main(): void {
     for (const finding of result.findings) process.stdout.write(`  +${finding.score} ${finding.message}\n`);
   }
 
-  if (options.failOnHalt && result.route === "HALT") process.exit(2);
-  if (options.failOnReview && result.route === "REVIEW") process.exit(3);
+  // Let pending piped output flush before enforcement terminates the process.
+  if (options.failOnHalt && result.route === "HALT") process.exitCode = 2;
+  if (options.failOnReview && result.route === "REVIEW") process.exitCode = 3;
 }
 
 /** Report an operational error and exit non-zero (distinct from HALT=2). */
@@ -92,12 +93,13 @@ function parseArgs(args: string[]): CliOptions {
     else if (arg === "--require-config") options.requireConfig = true;
     else if (arg === "--quiet") options.quiet = true;
     else if (arg === "--help" || arg === "-h") options.command = undefined;
+    else throw new Error(`Unknown option "${arg}"`);
   }
   return options;
 }
 
 function takeValue(flag: string, value: string | undefined, bump: () => void): string {
-  if (!value) throw new Error(`${flag} requires a value`);
+  if (!value || value.startsWith("-")) throw new Error(`${flag} requires a value`);
   bump();
   return value;
 }

@@ -50,10 +50,11 @@ function main() {
         for (const finding of result.findings)
             process.stdout.write(`  +${finding.score} ${finding.message}\n`);
     }
+    // Let pending piped output flush before enforcement terminates the process.
     if (options.failOnHalt && result.route === "HALT")
-        process.exit(2);
+        process.exitCode = 2;
     if (options.failOnReview && result.route === "REVIEW")
-        process.exit(3);
+        process.exitCode = 3;
 }
 /** Report an operational error and exit non-zero (distinct from HALT=2). */
 function fail(error) {
@@ -88,11 +89,13 @@ function parseArgs(args) {
             options.quiet = true;
         else if (arg === "--help" || arg === "-h")
             options.command = undefined;
+        else
+            throw new Error(`Unknown option "${arg}"`);
     }
     return options;
 }
 function takeValue(flag, value, bump) {
-    if (!value)
+    if (!value || value.startsWith("-"))
         throw new Error(`${flag} requires a value`);
     bump();
     return value;
