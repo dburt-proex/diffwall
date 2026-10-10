@@ -28,7 +28,7 @@ function main() {
     }
     let result;
     try {
-        const config = loadConfig(options.config);
+        const config = loadConfig(options.config, options.requireConfig);
         const diff = options.diff ? readFileSync(options.diff, "utf8") : readGitDiff(options);
         const codeowners = loadCodeowners();
         result = scanDiff(diff, config, codeowners);
@@ -52,6 +52,8 @@ function main() {
     }
     if (options.failOnHalt && result.route === "HALT")
         process.exit(2);
+    if (options.failOnReview && result.route === "REVIEW")
+        process.exit(3);
 }
 /** Report an operational error and exit non-zero (distinct from HALT=2). */
 function fail(error) {
@@ -78,6 +80,10 @@ function parseArgs(args) {
             options.config = takeValue(arg, next, () => index += 1);
         else if (arg === "--fail-on-halt")
             options.failOnHalt = true;
+        else if (arg === "--fail-on-review")
+            options.failOnReview = true;
+        else if (arg === "--require-config")
+            options.requireConfig = true;
         else if (arg === "--quiet")
             options.quiet = true;
         else if (arg === "--help" || arg === "-h")
@@ -105,6 +111,8 @@ Options:
   --format <format>     text | json | markdown | sarif
   --config <path>       Path to config file
   --fail-on-halt        Exit 2 when route is HALT
+  --fail-on-review      Exit 3 when route is REVIEW (human approval remains external)
+  --require-config      Require an explicit, complete block-format policy; no fallback
   --quiet               Only print final decision
 `);
 }

@@ -9,10 +9,14 @@ export const defaultConfig = {
     ],
     haltPatterns: ["DROP TABLE", "TRUNCATE TABLE", "rm -rf", "chmod 777", "rejectUnauthorized: false", "verify: false", "verify=False", "NODE_TLS_REJECT_UNAUTHORIZED=0"]
 };
-export function loadConfig(path) {
-    if (!path || !existsSync(path))
+export function loadConfig(path, required = false) {
+    if (!path || !existsSync(path)) {
+        if (required)
+            throw new Error("Required DiffWall config is missing");
         return defaultConfig;
-    const parsed = parseSimpleYaml(readFileSync(path, "utf8"));
+    }
+    const raw = readFileSync(path, "utf8");
+    const parsed = required ? parseRequiredPolicy(raw) : parseSimpleYaml(raw);
     const config = {
         thresholds: {
             review: Number(parsed.thresholds?.review ?? defaultConfig.thresholds.review),
@@ -24,6 +28,47 @@ export function loadConfig(path) {
     };
     validateConfig(config, path);
     return config;
+}
+/** Required policies use the documented block-only subset, with no ignored syntax. */
+function parseRequiredPolicy(raw) {
+    const sections = new Set(["thresholds", "ignorePaths", "protectedPaths", "haltPatterns"]);
+    const seen = new Set();
+    const thresholds = new Set();
+    let section = "";
+    for (const rawLine of raw.split(/\r?\n/)) {
+        if (!rawLine.trim() || rawLine.trimStart().startsWith("#"))
+            continue;
+        const header = rawLine.match(/^([A-Za-z]+):\s*(?:#.*)?$/);
+        if (header) {
+            section = header[1];
+            if (!sections.has(section) || seen.has(section))
+                throw new Error("Invalid required policy section");
+            seen.add(section);
+            continue;
+        }
+        if (section === "thresholds") {
+            const scalar = rawLine.match(/^  (review|halt):\s*(\d+(?:\.\d+)?)\s*(?:#.*)?$/);
+            if (!scalar || thresholds.has(scalar[1]))
+                throw new Error("Invalid required policy threshold");
+            thresholds.add(scalar[1]);
+        }
+        else {
+            const item = rawLine.match(/^  - (.+?)\s*$/);
+            if (!seen.has(section) || !item)
+                throw new Error("Invalid required policy syntax");
+            const value = item[1];
+            // Quoted strings have matching quotes; plain strings exclude YAML features.
+            const quoted = /^("[^"\r\n]+"|'[^'\r\n]+')$/.test(value);
+            const plain = /^[^\s\[\]{}&*!|>"'#][^\[\]{}&!|>"'#]*$/.test(value);
+            if (!quoted && !plain)
+                throw new Error("Invalid required policy list value");
+        }
+    }
+    if (seen.size !== sections.size || thresholds.size !== 2) {
+        throw new Error("Required policy must explicitly define all four sections and both thresholds");
+    }
+    // Strip comments accepted on headers/thresholds before passing to the legacy parser.
+    return parseSimpleYaml(raw.split(/\r?\n/).map(line => /^\S|^  (review|halt):/.test(line) ? line.replace(/#.*$/, "").trimEnd() : line).join("\n"));
 }
 /**
  * Reject policy files that would silently misroute changes. An out-of-range or
