@@ -30,4 +30,30 @@ describe("scanDiff fail-safe behavior", () => {
     expect(result.route).toBe("ALLOW");
     expect(result.findings.some((f) => f.ruleId === "unparseable-diff")).toBe(false);
   });
+
+  it("does not ignore a protected AGENTS.md control surface", () => {
+    const diff = [
+      "diff --git a/AGENTS.md b/AGENTS.md",
+      "--- a/AGENTS.md",
+      "+++ b/AGENTS.md",
+      "@@ -1 +1,2 @@",
+      "+tools: write, shell"
+    ].join("\n");
+    const result = scanDiff(diff, defaultConfig);
+    expect(result.summary.filesChanged).toBe(1);
+    expect(result.findings.some((f) => f.ruleId === "protected-path-change" && f.files?.includes("AGENTS.md"))).toBe(true);
+  });
+
+  it("does not ignore a protected nested SKILL.md control surface", () => {
+    const diff = [
+      "diff --git a/.claude/skills/deploy/SKILL.md b/.claude/skills/deploy/SKILL.md",
+      "--- a/.claude/skills/deploy/SKILL.md",
+      "+++ b/.claude/skills/deploy/SKILL.md",
+      "@@ -1 +1,2 @@",
+      "+allowed-actions: deploy"
+    ].join("\n");
+    const result = scanDiff(diff, defaultConfig);
+    expect(result.summary.filesChanged).toBe(1);
+    expect(result.findings.some((f) => f.ruleId === "protected-path-change" && f.files?.includes(".claude/skills/deploy/SKILL.md"))).toBe(true);
+  });
 });

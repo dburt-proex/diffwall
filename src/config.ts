@@ -5,7 +5,10 @@ export const defaultConfig: DiffWallConfig = {
   thresholds: { review: 40, halt: 75 },
   ignorePaths: ["docs/**", "*.md"],
   protectedPaths: [
-    ".github/workflows/**", "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock",
+    ".github/workflows/**", ".github/agents/**",
+    "AGENTS.md", "**/AGENTS.md", "CLAUDE.md", "**/CLAUDE.md", "SKILL.md", "**/SKILL.md",
+    ".claude/agents/**", ".claude/skills/**", ".mcp.json", "**/.mcp.json", "mcp.json", "**/mcp.json",
+    "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock",
     "requirements.txt", "pyproject.toml", "go.mod", "go.sum", "src/auth/**", "src/security/**",
     "auth/**", "security/**", "billing/**", "db/migrations/**", "migrations/**"
   ],
