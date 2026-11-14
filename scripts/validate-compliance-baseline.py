@@ -57,7 +57,7 @@ def validate(root):
     states = data["states"]
     require(isinstance(states, list) and all(isinstance(s, str) for s in states), "states must be a list of strings")
     require(len(states) == len(STATES) and set(states) == STATES, "invalid declared control states")
-    require(data["canonical_registry"] == "UNRESOLVED" and data["canonical_registry_version"] == "UNRESOLVED", "registry authority is unresolved; an owner-reviewed schema change is required before asserting canonical ownership")
+    require(data["canonical_registry"] == "dburt-proex/casa/governance/CONTROL-REGISTRY.yaml" and data["canonical_registry_version"] == "0.1", "invalid canonical registry binding; see main commit 973f712c2f8cad1821e5e1e3b5b3f0a005058bdd")
     controls = data["controls"]
     require(isinstance(controls, dict) and set(controls) == CONTROLS, "missing or unknown control identifiers")
 
@@ -71,7 +71,7 @@ def validate(root):
         require({"status", "evidence"} <= set(control) <= {"status", "evidence", "note", "gap"}, f"{name}: invalid fields")
         status = control["status"]
         require(isinstance(status, str) and status in STATES, f"{name}: invalid status")
-        require(status != "VERIFIED", f"{name}: VERIFIED is unsupported while registry authority is unresolved")
+        require(status != "VERIFIED", f"{name}: VERIFIED requires assessment evidence beyond this internal baseline")
         for field in ("note", "gap"):
             if field in control:
                 require(isinstance(control[field], str) and bool(control[field].strip()), f"{name}: {field} must be nonempty text")

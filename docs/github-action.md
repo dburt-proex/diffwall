@@ -12,7 +12,9 @@ Use it from another repository with:
 uses: dburt-proex/diffwall/action@v0.2.0
 ```
 
-The action has been validated in real `REVIEW` and `HALT` pull-request workflows. Use the immutable `v0.2.0` tag for controlled evaluation and pilots.
+The action has been validated in real `REVIEW` and `HALT` pull-request workflows.
+Use `v0.2.0` for controlled evaluation and pilots. For an immutable code reference,
+pin its exact commit SHA; a version tag alone is not a platform immutability guarantee.
 
 ---
 
@@ -96,3 +98,118 @@ npx tsx src/cli.ts scan --base origin/main --head HEAD --format markdown --fail-
 The composite action is live-validated for loading, scanning, evidence generation, PR comment creation/update, `REVIEW` routing, and `HALT` enforcement without dependency installation in the caller repository. In the controlled HALT proof, the report and comment were published before the workflow failed as designed. TypeScript and Python CI jobs also generate ALLOW / REVIEW / HALT evidence artifacts.
 
 The next assurance gate is external validation across representative repositories and additional monorepo shapes.
+
+## Hardened integration (unreleased)
+
+The controls below are available only on a reviewed commit containing this hardening,
+not the existing v0.2.0 release. Replace the marked action-ref placeholder with its
+exact reviewed commit SHA before using this example. No new release is implied.
+
+| Control | Default | Opt-in behavior |
+|---|---|---|
+| `require_config` | `false` | Missing, incomplete, or malformed policy fails with exit 1; no built-in fallback. |
+| `fail_on_review` | `false` | REVIEW reports are produced before exit 3. This does not grant or verify human approval. |
+
+CLI equivalents are `--require-config` and `--fail-on-review`. HALT remains exit 2
+when `fail_on_halt` is enabled. Enable both route flags for hardened enforcement.
+Existing invocations retain their previous defaults and report schema.
+
+The development test toolchain is pinned to patched Vitest 4.1.11. Its resolved
+Vite dependency requires Node 20.19+ or 22.12+ (or a supported newer release);
+the Node 20/22 CI jobs use current patch releases. The committed action runtime
+still has no npm runtime dependencies and retains its Node 20+ contract.
+
+Required policy format is the documented block subset: all four sections
+(`thresholds`, `ignorePaths`, `protectedPaths`, `haltPatterns`) must be explicitly
+present, with both numeric `review` and `halt` thresholds. List entries use two-space
+indentation and plain or matching-quoted strings. Empty block list sections are
+allowed. Duplicate or unknown sections, unknown syntax, inline lists/maps, anchors,
+multiline scalars, and incomplete policies are rejected. This is not a general YAML
+parser. Ordinary optional loading remains compatible with earlier policy files.
+
+### Trusted base policy
+
+Obtain the policy from the PR's exact base commit in a separate checkout. Check out
+the exact PR head for scanning, without executing candidate code. Protect the
+workflow and the action SHA through repository governance. A path alone does not
+prove trust: `require_config` validates policy structure, not its authority.
+
+```yaml
+name: DiffWall hardened scan
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted-policy
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      # Placeholder: replace with an exact reviewed hardening commit SHA.
+      - uses: dburt-proex/diffwall/action@REPLACE_WITH_REVIEWED_COMMIT_SHA
+        with:
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+          config: ${{ github.workspace }}/trusted-policy/rules/default.yml
+          require_config: true
+          fail_on_review: true
+          fail_on_halt: true
+          format: json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: diffwall-hardened-evidence
+          path: |
+            diffwall-report.json
+            diffwall-policy-evidence.json
+            diffwall-action.log
+          if-no-files-found: error
+```
+
+`diffwall-policy-evidence.json` records the scan source, resolved base/head commit SHAs, the policy
+file's SHA-256, its checkout HEAD when available, the report path, and scan exit
+status and report-write exit status. For saved-diff input it records the diff path
+and SHA-256 and leaves base/head SHAs null, since those commits were not scanned.
+Saved-diff evidence must not be treated as validation of the current PR commits.
+The route and findings stay in the accompanying report. A checkout HEAD
+is provenance metadata, not proof the file is unmodified or authorized. Bind an
+approval to the head SHA, base-policy revision, and policy hash; never approve a
+mutable branch name. Null provenance must be investigated rather than invented.
+Preserve both evidence files even on REVIEW, HALT, or operational failure.
+The CLI allows pending output to flush before REVIEW/HALT enforcement. The action
+fails on report-write errors and invalid boolean inputs. Unknown CLI options and
+missing option values fail instead of silently disabling an enforcement flag.
+
+### Human approval boundary
+
+The scan remains failed on REVIEW even after someone submits a GitHub review.
+For a simple deployment, require this scan and keep REVIEW changes blocked while
+the underlying concern is resolved. If approved REVIEW changes may merge, use a
+separately reviewed protected aggregate gate that consumes the scan result and
+explicit authorized human approval. Require that aggregate check, and retain the
+failed scan as evidence. Do not merely add another green check beside a failing
+required check or mark the scanner successful with `continue-on-error`.
+
+The aggregate gate must reject HALT and operational errors, verify approval for
+the exact current head and policy hash, invalidate approval on new commits or
+policy changes, restrict authorized reviewers, and prevent candidate code from
+producing its own approval. Approval must never downgrade HALT. Repository rules,
+workflow protection, bypass permissions, and approval enforcement must be verified
+before calling the integration production-enforced. This increment does not
+change live branch protection, create an approval service, or implement that gate.
+
+Rollback: revert this hardening or remove its opt-in inputs through reviewed
+workflow changes. Preserve v0.2.0 and publish any successor under a new version.

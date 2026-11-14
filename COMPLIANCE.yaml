@@ -1,8 +1,8 @@
 version: '0.1'
 system: DiffWall
 repository: dburt-proex/diffwall
-canonical_registry: UNRESOLVED
-canonical_registry_version: UNRESOLVED
+canonical_registry: dburt-proex/casa/governance/CONTROL-REGISTRY.yaml
+canonical_registry_version: '0.1'
 claim_boundary: no_certification_or_attestation_claim_without_independent_assurance
 assessment_date: '2026-08-16'
 states: [NOT_APPLICABLE, MISSING, PARTIAL, IMPLEMENTED, VERIFIED]

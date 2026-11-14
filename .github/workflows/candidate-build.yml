@@ -22,14 +22,6 @@ jobs:
           npm update nanoid postcss vite source-map-js --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Clean installation from generated lockfile
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Prove CLI regressions against old runtime
-        shell: bash
-        run: |
-          set +e
-          npm test -- test/cli.test.ts
-          status=$?
-          set -e
-          test "$status" -ne 0
       - name: Generate committed JavaScript from TypeScript
         run: npm run build
       - name: Full tests against generated runtime

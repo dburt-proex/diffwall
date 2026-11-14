@@ -18,8 +18,6 @@ class ComplianceGateTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.manifest = yaml.safe_load((REPO / "COMPLIANCE.yaml").read_text(encoding="utf-8"))
         self.manifest["controls"]["SEC-001"]["evidence"] = ["SECURITY.md", "test"]
-        self.manifest["canonical_registry"] = "UNRESOLVED"
-        self.manifest["canonical_registry_version"] = "UNRESOLVED"
         for control in self.manifest["controls"].values():
             for relative in control["evidence"]:
                 path = self.root / relative
@@ -102,6 +100,7 @@ class ComplianceGateTests(unittest.TestCase):
         self.assert_rejected(self.run_gate())
 
     def test_unresolved_registry_cannot_claim_verified_controls(self):
+        self.manifest["canonical_registry"] = "UNRESOLVED"
         self.manifest["controls"]["GOV-001"]["status"] = "VERIFIED"
         self.assert_rejected(self.run_gate())
 

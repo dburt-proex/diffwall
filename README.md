@@ -1,5 +1,7 @@
 # DiffWall
 
+**Portfolio evidence:** [Systems & proof](https://drew-burt-portfolio.daxxer-os.chatgpt.site/systems) · [Governance Lab](https://drew-burt-portfolio.daxxer-os.chatgpt.site/lab) · [v0.2.0 release evidence](https://github.com/dburt-proex/DDBPORTFOLIO.git.io/blob/main/diffwall-v0.2.0-release.html)
+
 A deterministic enforcement firewall for AI-generated code and agent actions.
 
 DiffWall scans pull-request diffs and structured agent actions, applies transparent repository-local policy, and routes each change to `ALLOW`, `REVIEW`, or `HALT`.
@@ -14,7 +16,7 @@ Those systems may be used independently around DiffWall:
 
 - **Operator Intelligence** may assess and prioritize governance gaps.
 - **DiffWall** enforces change-time and structured-action boundaries.
-- **CASA** is a separate runtime-governance architecture with unresolved canonical repository ownership.
+- **CASA** is a separate runtime-governance architecture maintained at [`dburt-proex/casa`](https://github.com/dburt-proex/casa).
 - **VIL**, **PromptBP**, and the **Governance Harness Toolkit** are optional independent supporting systems.
 
 No cross-repository runtime dependency is implied.
