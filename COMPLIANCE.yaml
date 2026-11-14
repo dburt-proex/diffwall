@@ -4,7 +4,7 @@ repository: dburt-proex/diffwall
 canonical_registry: dburt-proex/casa/governance/CONTROL-REGISTRY.yaml
 canonical_registry_version: '0.1'
 claim_boundary: no_certification_or_attestation_claim_without_independent_assurance
-assessment_date: '2026-08-16'
+assessment_date: '2026-11-14'
 states: [NOT_APPLICABLE, MISSING, PARTIAL, IMPLEMENTED, VERIFIED]
 controls:
   GOV-001:
@@ -33,7 +33,7 @@ controls:
   SEC-001:
     status: PARTIAL
     evidence: [SECURITY.md, demo/diffs, src, test, packages/action-firewall/tests, .github/workflows/release-readiness.yml]
-    gap: Release-readiness run 31989256302 failed the Node 20 high-severity dependency audit. Evidence artifact identified nanoid 3.3.16 as a high-severity transitive development dependency vulnerability (GHSA-2v37-7h3g-55p8) with a fix available; reproducible package-manager remediation and independent security assessment remain outstanding.
+    gap: Dependency remediation was generated through npm on Node 20 in run 43609822176 (Vitest 4.1.12; zero audited vulnerabilities). The exact committed candidate must pass the release-readiness matrix; independent security assessment remains outstanding.
   INC-001:
     status: PARTIAL
     evidence: [STATUS.md, .github/workflows/release-readiness.yml]
