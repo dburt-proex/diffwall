@@ -11,6 +11,7 @@ Scope: repair PR #43 on top of current main. No merge, tag, release, deployment,
 - Parse and validate the compliance manifest, tracked evidence paths and control/remediation shapes; reject malformed YAML, duplicate keys and unsafe paths.
 - Execute composite action route checks on pull requests.
 - Pin official workflow actions to reviewed upstream commit identities.
+- Run the full suite and compiler parity on Windows Node 22 as well as Linux Node 20/22.
 - Audit both supported Node jobs and verify the extracted candidate archive without source or installed dependencies.
 
 ## Reproduction and provenance

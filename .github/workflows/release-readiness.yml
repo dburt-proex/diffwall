@@ -170,3 +170,42 @@ jobs:
 
           test "$halt_status" -eq 2
           grep -q '"verdict": "HALT"' /tmp/halt.json
+
+  windows-compatibility:
+    name: Windows Node 22 release evidence
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 22
+      - name: Prepare Windows evidence
+        run: |
+          mkdir -p artifacts/release-readiness-windows
+          node --version
+          npm --version
+      - name: Clean Windows installation
+        run: npm ci --no-audit --no-fund
+      - name: Build on Windows
+        run: npm run build
+      - name: Verify Windows compiler parity
+        run: git diff --exit-code -- dist
+      - name: Full Windows unit and compatibility suite
+        run: npm test -- --reporter=verbose 2>&1 | tee artifacts/release-readiness-windows/tests.log
+      - name: Windows high-severity dependency audit
+        run: npm audit --audit-level=high --json | tee artifacts/release-readiness-windows/npm-audit.json
+      - name: Upload Windows evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: diffwall-release-readiness-windows-node-22
+          path: artifacts/release-readiness-windows
+          if-no-files-found: error
+          retention-days: 30
