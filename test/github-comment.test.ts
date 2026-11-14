@@ -54,7 +54,7 @@ describe("updatePullRequestComment pagination", () => {
 
     const patch = calls.find((c) => c.method === "PATCH");
     const post = calls.find((c) => c.method === "POST");
-    expect(patch?.url).toContain("/comments/42");
+    expect(patch?.url).toBe("https://api.github.test/repos/acme/widgets/issues/comments/42");
     expect(post).toBeUndefined();
     expect(calls.some((c) => c.url.includes("page=2"))).toBe(true);
   });

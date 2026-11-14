@@ -95,6 +95,13 @@ function parseArgs(args: string[]): CliOptions {
     else if (arg === "--help" || arg === "-h") options.command = undefined;
     else throw new Error(`Unknown option "${arg}"`);
   }
+  if (options.diff && (options.staged || options.base || options.head)) {
+    throw new Error("Cannot combine --diff with --staged, --base, or --head");
+  }
+  if (options.staged && (options.base || options.head)) {
+    throw new Error("Cannot combine --staged with --base or --head");
+  }
+  if (options.head && !options.base) throw new Error("--head requires --base");
   return options;
 }
 
@@ -105,7 +112,7 @@ function takeValue(flag: string, value: string | undefined, bump: () => void): s
 }
 
 function printHelp(): void {
-  process.stdout.write(`DiffWall — a PR risk firewall for agent-written code.
+  process.stdout.write(`DiffWall - a PR risk firewall for agent-written code.
 
 Usage:
   diffwall scan [options]

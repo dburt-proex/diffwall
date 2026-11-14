@@ -1,0 +1,29 @@
+name: Compliance baseline
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.12"
+      - name: Install pinned manifest parser
+        run: python -m pip install --disable-pip-version-check -r scripts/requirements-compliance.txt
+      - name: Regression tests for malformed and unsafe manifests
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Validate schema and tracked evidence paths
+        run: python scripts/validate-compliance-baseline.py

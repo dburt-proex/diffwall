@@ -1,4 +1,5 @@
 import { readFileSync, appendFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 const marker = "<!-- diffwall-report -->";
 
@@ -44,7 +45,7 @@ export async function updatePullRequestComment(): Promise<void> {
   const existing = comments.find((comment) => comment.body?.includes(marker));
 
   if (existing) {
-    await request(`${commentsUrl}/${existing.id}`, token, {
+    await request(`${apiBase}/repos/${repository}/issues/comments/${existing.id}`, token, {
       method: "PATCH",
       body: JSON.stringify({ body })
     });
@@ -118,7 +119,7 @@ function fallback(reason: string, report?: string): void {
   if (process.env.GITHUB_STEP_SUMMARY && report) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   updatePullRequestComment().catch((error: unknown) => {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;

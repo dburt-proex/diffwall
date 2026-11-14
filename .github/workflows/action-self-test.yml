@@ -2,15 +2,18 @@ name: Action Self-Test
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches: [main]
     paths:
       - "action/**"
       - "src/**"
+      - "dist/**"
       - "rules/**"
       - "test/fixtures/**"
       - ".github/workflows/action-self-test.yml"
       - "package.json"
+      - "package-lock.json"
       - "tsconfig.json"
 
 permissions:
@@ -22,11 +25,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
           fetch-depth: 0
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 20
 
@@ -75,7 +80,7 @@ jobs:
 
       - name: Upload route evidence
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: diffwall-action-route-evidence
           path: artifacts/action-self-test

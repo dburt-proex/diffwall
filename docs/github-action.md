@@ -114,7 +114,7 @@ CLI equivalents are `--require-config` and `--fail-on-review`. HALT remains exit
 when `fail_on_halt` is enabled. Enable both route flags for hardened enforcement.
 Existing invocations retain their previous defaults and report schema.
 
-The development test toolchain is pinned to patched Vitest 4.1.11. Its resolved
+The development test toolchain is pinned to patched Vitest 4.1.12. Its resolved
 Vite dependency requires Node 20.19+ or 22.12+ (or a supported newer release);
 the Node 20/22 CI jobs use current patch releases. The committed action runtime
 still has no npm runtime dependencies and retains its Node 20+ contract.
