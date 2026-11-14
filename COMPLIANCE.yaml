@@ -1,8 +1,8 @@
 version: '0.1'
 system: DiffWall
 repository: dburt-proex/diffwall
-canonical_registry: dburt-proex/casa/governance/CONTROL-REGISTRY.yaml
-canonical_registry_version: '0.1'
+canonical_registry: UNRESOLVED
+canonical_registry_version: UNRESOLVED
 claim_boundary: no_certification_or_attestation_claim_without_independent_assurance
 assessment_date: '2026-08-16'
 states: [NOT_APPLICABLE, MISSING, PARTIAL, IMPLEMENTED, VERIFIED]
@@ -32,7 +32,7 @@ controls:
     evidence: [docs/live-validation-case-study.md, docs/ai-coding-governance-pilot.md, src/output, .github/workflows/release-readiness.yml]
   SEC-001:
     status: PARTIAL
-    evidence: [SECURITY.md, demo/diffs, src, tests, .github/workflows/release-readiness.yml]
+    evidence: [SECURITY.md, demo/diffs, src, test, packages/action-firewall/tests, .github/workflows/release-readiness.yml]
     gap: Release-readiness run 31989256302 failed the Node 20 high-severity dependency audit. Evidence artifact identified nanoid 3.3.16 as a high-severity transitive development dependency vulnerability (GHSA-2v37-7h3g-55p8) with a fix available; reproducible package-manager remediation and independent security assessment remain outstanding.
   INC-001:
     status: PARTIAL

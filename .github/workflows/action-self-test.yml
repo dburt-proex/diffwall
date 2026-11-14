@@ -2,15 +2,18 @@ name: Action Self-Test
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches: [main]
     paths:
       - "action/**"
       - "src/**"
+      - "dist/**"
       - "rules/**"
       - "test/fixtures/**"
       - ".github/workflows/action-self-test.yml"
       - "package.json"
+      - "package-lock.json"
       - "tsconfig.json"
 
 permissions:

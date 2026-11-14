@@ -13,7 +13,8 @@ export const defaultConfig: DiffWallConfig = {
 };
 
 export function loadConfig(path?: string): DiffWallConfig {
-  if (!path || !existsSync(path)) return defaultConfig;
+  if (!path) return defaultConfig;
+  if (!existsSync(path)) throw new Error(`DiffWall config not found: ${path}`);
   const parsed = parseSimpleYaml(readFileSync(path, "utf8"));
   const config: DiffWallConfig = {
     thresholds: {
@@ -81,7 +82,7 @@ function cleanYamlValue(value: string): string | number {
 }
 
 export function globToRegExp(pattern: string): RegExp {
-  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*/g, "§DOUBLE_STAR§").replace(/\*/g, "[^/]*").replace(/§DOUBLE_STAR§/g, ".*");
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*/g, "DOUBLE_STAR").replace(/\*/g, "[^/]*").replace(/DOUBLE_STAR/g, ".*");
   return new RegExp(`^${escaped}$`);
 }
 

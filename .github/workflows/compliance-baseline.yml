@@ -2,10 +2,9 @@ name: Compliance baseline
 
 on:
   pull_request:
-    paths: ['COMPLIANCE.yaml','docs/COMPLIANCE-READINESS.md','.github/workflows/compliance-baseline.yml']
   push:
     branches: [main]
-    paths: ['COMPLIANCE.yaml','docs/COMPLIANCE-READINESS.md']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,20 +12,15 @@ permissions:
 jobs:
   validate-baseline:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - name: Validate compliance manifest contract
-        shell: python
-        run: |
-          from pathlib import Path
-          manifest = Path('COMPLIANCE.yaml')
-          readiness = Path('docs/COMPLIANCE-READINESS.md')
-          assert manifest.exists()
-          assert readiness.exists()
-          text = manifest.read_text(encoding='utf-8')
-          required = ['canonical_registry:','claim_boundary: no_certification_or_attestation_claim_without_independent_assurance','controls:','remediation:','external_assurance_gate:']
-          missing = [x for x in required if x not in text]
-          assert not missing, f'missing manifest fields: {missing}'
-          for control in ['GOV-001','RSK-001','IAM-001','CHG-001','LOG-001','EVD-001','SEC-001','INC-001','AI-001','DAT-001','SUP-001','BCM-001','REV-001']:
-              assert control in text, f'missing canonical control {control}'
-          print('compliance baseline contract: PASS')
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install pinned manifest parser
+        run: python -m pip install --disable-pip-version-check -r scripts/requirements-compliance.txt
+      - name: Regression tests for malformed and unsafe manifests
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Validate schema and tracked evidence paths
+        run: python scripts/validate-compliance-baseline.py
