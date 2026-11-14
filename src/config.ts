@@ -82,7 +82,7 @@ function cleanYamlValue(value: string): string | number {
 }
 
 export function globToRegExp(pattern: string): RegExp {
-  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*/g, "DOUBLE_STAR").replace(/\*/g, "[^/]*").replace(/DOUBLE_STAR/g, ".*");
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*\*/g, "§DOUBLE_STAR§").replace(/\*/g, "[^/]*").replace(/§DOUBLE_STAR§/g, ".*");
   return new RegExp(`^${escaped}$`);
 }
 

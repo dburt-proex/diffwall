@@ -17,7 +17,9 @@ jobs:
         with:
           node-version: 20
       - name: Resolve patched transitive dependency through npm
-        run: npm update nanoid --package-lock-only --ignore-scripts --no-audit --no-fund
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm update nanoid postcss vite source-map-js --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Clean installation from generated lockfile
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Prove CLI regressions against old runtime

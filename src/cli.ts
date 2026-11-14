@@ -106,7 +106,7 @@ function takeValue(flag: string, value: string | undefined, bump: () => void): s
 }
 
 function printHelp(): void {
-  process.stdout.write(`DiffWall - a PR risk firewall for agent-written code.
+  process.stdout.write(`DiffWall — a PR risk firewall for agent-written code.
 
 Usage:
   diffwall scan [options]

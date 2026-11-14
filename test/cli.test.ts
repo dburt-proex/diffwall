@@ -6,6 +6,14 @@ function cli(...args: string[]) {
 }
 
 describe("CLI policy input failures", () => {
+  it("executes the comment entrypoint on every supported platform", () => {
+    const env = { ...process.env };
+    delete env.DIFFWALL_REPORT_PATH;
+    const result = spawnSync(process.execPath, ["dist/github-comment.js"], { encoding: "utf8", env });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toMatch(/Skipping PR comment update: DIFFWALL_REPORT_PATH is not set/);
+  });
+
   it("rejects unknown options instead of silently scanning a different input", () => {
     const result = cli("--diff", "test/fixtures/safe-doc-change.diff", "--confg", "strict.yml");
     expect(result.status).toBe(1);
